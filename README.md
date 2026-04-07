@@ -1,11 +1,15 @@
-# 🛍️ Reto Desarrollador Frontend
+# 🛍️ Reto Desarrollador Full Stack
 
 ## 🇪🇸 Menú de contenido
+
+### Instrucciones en Español
 - 🇪🇸 [Descripción](#es-descripción)
 - 🇪🇸 [Funcionalidades](#es-funcionalidades)
 - 🇪🇸 [Tecnologías](#es-tecnologías)
 - 🇪🇸 [Plan de trabajo](#es-plan-de-trabajo)
 - 🇪🇸 [Instrucciones de uso](#es-instrucciones-de-uso)
+
+### English Menu of Contents
 - 🇬🇧 [Description](#en-description)
 - 🇬🇧 [Features](#en-features)
 - 🇬🇧 [Technologies](#en-technologies)
@@ -154,6 +158,9 @@ Challenge to build an online store app that consumes REST services.
 
 ## 🇬🇧 How to use
 1. Clone the repository
+   ```bash
+   git clone https://github.com/xaca/reto_fullstack.git
+    ```
 2. Install dependencies:
    ```bash
    npm install
@@ -173,17 +180,6 @@ Challenge to build an online store app that consumes REST services.
 - `https://axios-http.com/`
 
 ---
-
-## Notes
-- Mantén español primero y luego inglés.
-- Usa el menú con banderas para navegar entre secciones.
-- Ajusta el contenido según el progreso real de tu proyecto.
-
-
-
-
-
-
 
 ## Tips Importantes
 
