@@ -94,16 +94,16 @@ function getFromStorage(){
 }
 // busca los productos por nombre dentro del local storage
 function buscarProducto(){
-    
-    $("#btn_busqueda").click(function(){
-        var txt_busqueda = $("#txt_busqueda").text;
-        
+
+    document.getElementById("btn_busqueda").addEventListener("click", function(){
+        var txt_busqueda = document.getElementById("txt_busqueda").value;
+
         for (var i = 0; i < storage.length; i++) {
-            if(storage[i].nombre.contains(txt_busqueda))
+            if(storage[i].nombre.includes(txt_busqueda))
             {
                 resultado.push(storage[i]);
             }
-            
+
         }
     });
 
