@@ -5,29 +5,29 @@ Reto para practicar las habilidades de un desarrollador fullstack moderno.
 > Este repositorio es el punto de partida. Clona este proyecto y usa su contenido como base para desarrollar paso a paso.
 > Trabaja con commits pequeños y claros desde aquí.
 
-## 🇪🇸 Menú de contenido
+## <img src="https://flagcdn.com/w40/co.png" width="30"> Menú de contenido
 
 ### Instrucciones en Español
-- 🇪🇸 [Enunciado](#es-enunciado)
-- 🇪🇸 [Funcionalidades](#es-funcionalidades)
-- 🇪🇸 [Tecnologías Requeridas](#es-tecnologías-requeridas)
-- 🇪🇸 [Instrucciones de uso](#es-instrucciones-de-uso)
-- 🇪🇸 [Instrucciones Paso a Paso](#es-instrucciones-paso-a-paso)
-- 🇪🇸 [Tips Importantes](#es-tips-importantes)
-- 🇪🇸 [Información de Interés](#es-información-de-interés)
+- <img src="https://flagcdn.com/w40/co.png" width="20"> [Enunciado](#es-enunciado)
+- <img src="https://flagcdn.com/w40/co.png" width="20"> [Funcionalidades](#es-funcionalidades)
+- <img src="https://flagcdn.com/w40/co.png" width="20"> [Tecnologías Requeridas](#es-tecnologías-requeridas)
+- <img src="https://flagcdn.com/w40/co.png" width="20"> [Instrucciones de uso](#es-instrucciones-de-uso)
+- <img src="https://flagcdn.com/w40/co.png" width="20"> [Instrucciones Paso a Paso](#es-instrucciones-paso-a-paso)
+- <img src="https://flagcdn.com/w40/co.png" width="20"> [Tips Importantes](#es-tips-importantes)
+- <img src="https://flagcdn.com/w40/co.png" width="20"> [Información de Interés](#es-información-de-interés)
 
 ### English Menu of Contents
-- 🇬🇧 [Statement](#en-statement)
-- 🇬🇧 [Features](#en-features)
-- 🇬🇧 [Required Technologies](#en-required-technologies)
-- 🇬🇧 [How to use](#en-how-to-use)
-- 🇬🇧 [Step by Step Instructions](#en-step-by-step-instructions)
-- 🇬🇧 [Important Tips](#en-important-tips)
-- 🇬🇧 [Resources](#en-resources)
+- <img src="https://flagcdn.com/w40/us.png" width="20"> [Statement](#en-statement)
+- <img src="https://flagcdn.com/w40/us.png" width="20"> [Features](#en-features)
+- <img src="https://flagcdn.com/w40/us.png" width="20"> [Required Technologies](#en-required-technologies)
+- <img src="https://flagcdn.com/w40/us.png" width="20"> [How to use](#en-how-to-use)
+- <img src="https://flagcdn.com/w40/us.png" width="20"> [Step by Step Instructions](#en-step-by-step-instructions)
+- <img src="https://flagcdn.com/w40/us.png" width="20"> [Important Tips](#en-important-tips)
+- <img src="https://flagcdn.com/w40/us.png" width="20"> [Resources](#en-resources)
 
 ---
 
-## 🇪🇸 Enunciado
+## <img src="https://flagcdn.com/w40/co.png" width="30"> Enunciado
 
 Desarrollar una aplicación web fullstack para una tienda online que consuma una API REST. La aplicación debe incluir las siguientes funcionalidades:
 
@@ -51,7 +51,7 @@ Se permite reutilizar código de internet, citando las fuentes. El trabajo es in
 
 ---
 
-## 🇪🇸 Funcionalidades
+## <img src="https://flagcdn.com/w40/co.png" width="30"> Funcionalidades
 - ✅ Registro de usuarios y sesión persistente
 - ✅ Galería dinámica de productos
 - ✅ Búsqueda en tiempo real
@@ -61,7 +61,7 @@ Se permite reutilizar código de internet, citando las fuentes. El trabajo es in
 
 ---
 
-## 🇪🇸 Tecnologías Requeridas
+## <img src="https://flagcdn.com/w40/co.png" width="30"> Tecnologías Requeridas
 
 - **Frontend**: React con Tailwind CSS para estilos.
 - **Gestión de estado y persistencia**: Zustand (recomendado) o Context API con localStorage.
@@ -70,7 +70,7 @@ Se permite reutilizar código de internet, citando las fuentes. El trabajo es in
 
 ---
 
-## 🇪🇸 Instrucciones de uso
+## <img src="https://flagcdn.com/w40/co.png" width="30"> Instrucciones de uso
 1. Clone el repositorio
   ```bash
   git clone https://github.com/xaca/reto_fullstack.git
@@ -105,7 +105,7 @@ Se permite reutilizar código de internet, citando las fuentes. El trabajo es in
 
 ---
 
-## 🇪🇸 Instrucciones Paso a Paso
+## <img src="https://flagcdn.com/w40/co.png" width="30"> Instrucciones Paso a Paso
 
 ### Paso 1: Selecciona una Plantilla de Referencia
 - Visita https://themewagon.com/ y busca una plantilla de tienda online (ecommerce template).
@@ -258,17 +258,21 @@ Se permite reutilizar código de internet, citando las fuentes. El trabajo es in
 
 ---
 
-## 🇪🇸 Tips Importantes
+## <img src="https://flagcdn.com/w40/co.png" width="30"> Tips Importantes
 
 ✅ **Comienza con mockdata**: Así estableces la estructura y lógica sin depender de la API.
+
 ✅ **Usa Zustand**: Simplifica la gestión de estado comparado con Context API.
+
 ✅ **Commits frecuentes**: Cada paso pequeño merecería su commit (mínimo 30 commits).
+
 ✅ **Testing visual**: Prueba en diferentes tamaños de pantalla mientras desarrollas.
+
 ✅ **Firebase es bonus**: Enfócate primero en que todo funcione con localStorage.
 
 ---
 
-## 🇪🇸 Información de Interés
+## <img src="https://flagcdn.com/w40/co.png" width="30"> Información de Interés
 
 - **Documentación de React**: https://react.dev/
 - **Tailwind CSS**: https://tailwindcss.com/
@@ -284,7 +288,7 @@ Se permite reutilizar código de internet, citando las fuentes. El trabajo es in
 ---
 
 
-## 🇬🇧 Statement
+## <img src="https://flagcdn.com/w40/us.png" width="30"> Statement
 
 Develop a fullstack web application for an online store that consumes a REST API. The application must include the following functionalities:
 
@@ -308,7 +312,7 @@ Reusing code from the internet is allowed, citing sources. The work is individua
 
 ---
 
-## 🇬🇧 Features
+## <img src="https://flagcdn.com/w40/us.png" width="30"> Features
 - ✅ User registration and persistent session
 - ✅ Dynamic product gallery
 - ✅ Real-time search
@@ -318,7 +322,7 @@ Reusing code from the internet is allowed, citing sources. The work is individua
 
 ---
 
-## 🇬🇧 Required Technologies
+## <img src="https://flagcdn.com/w40/us.png" width="30"> Required Technologies
 
 - **Frontend**: React with Tailwind CSS for styling.
 - **State management and persistence**: Zustand (recommended) or Context API with localStorage.
@@ -327,7 +331,7 @@ Reusing code from the internet is allowed, citing sources. The work is individua
 
 ---
 
-## 🇬🇧 How to use
+## <img src="https://flagcdn.com/w40/us.png" width="30"> How to use
 1. Clone the repository
   ```bash
   git clone https://github.com/xaca/reto_fullstack.git
@@ -368,7 +372,7 @@ Reusing code from the internet is allowed, citing sources. The work is individua
 
 ---
 
-## 🇬🇧 Step by Step Instructions
+## <img src="https://flagcdn.com/w40/us.png" width="30"> Step by Step Instructions
 
 ### Step 1: Select a Reference Template
 - Visit https://themewagon.com/ and search for an online store template (ecommerce template).
@@ -521,17 +525,21 @@ Reusing code from the internet is allowed, citing sources. The work is individua
 
 ---
 
-## 🇬🇧 Important Tips
+## <img src="https://flagcdn.com/w40/us.png" width="30"> Important Tips
 
 ✅ **Start with mockdata**: This way you establish the structure and logic without depending on the API.
+
 ✅ **Use Zustand**: Simplifies state management compared to Context API.
+
 ✅ **Frequent commits**: Each small step deserves its commit (minimum 30 commits).
+
 ✅ **Visual testing**: Test on different screen sizes while developing.
+
 ✅ **Firebase is bonus**: Focus first on everything working with localStorage.
 
 ---
 
-## 🇬🇧 Resources
+## <img src="https://flagcdn.com/w40/us.png" width="30"> Resources
 
 - **React Documentation**: https://react.dev/
 - **Tailwind CSS**: https://tailwindcss.com/
@@ -541,103 +549,5 @@ Reusing code from the internet is allowed, citing sources. The work is individua
 - **Firebase (Bonus)**: https://firebase.google.com/docs
 - **Atomic Design**: https://bradfrost.com/blog/post/atomic-web-design/
 - **Responsive Design**: https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design
-- **Axios (HTTP client)**: https://axios-http.com/
-- **Vite (Build tool)**: https://vitejs.dev/
-
----
-
-## 🇬🇧 Features
-- ✅ User registration and persistent session
-- ✅ Dynamic product gallery
-- ✅ Real-time search
-- ✅ Product pagination
-- ✅ Shopping cart with quantity control
-- ✅ Checkout preview page
-
----
-
-## 🇬🇧 Technologies
-- React
-- Tailwind CSS
-- Zustand
-- Axios
-- Vite
-
----
-
-## 🇬🇧 Work Plan
-1. **Project setup**
-   - Create React project with Vite
-   - Configure Tailwind CSS
-2. **Mock data**
-   - Add products, users and categories
-3. **Component structure**
-   - Atoms, molecules, organisms, templates
-4. **State management**
-   - Zustand for products, cart and auth
-5. **Product gallery**
-   - Display products dynamically
-6. **Shopping cart**
-   - Add, remove and update item quantities
-7. **Search**
-   - Filter products while typing
-8. **Pagination**
-   - Add product page navigation
-9. **User registration and session**
-   - Persist user with localStorage
-10. **Checkout**
-    - Order summary and confirmation
-11. **Responsive design**
-    - Mobile, tablet, and desktop layout
-12. **Real API (optional)**
-    - Use `https://fakestoreapi.com/`
-13. **Bonus**
-    - Firebase Authentication / Firestore
-
----
-
-## 🇬🇧 How to use
-1. Clone the repository
-   ```bash
-   git clone https://github.com/xaca/reto_fullstack.git
-    ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Run the project:
-   ```bash
-   npm run dev
-   ```
-
----
-
-## Recursos
-- `https://fakestoreapi.com/`
-- `https://react.dev/`
-- `https://tailwindcss.com/`
-- `https://zustand.docs.pmnd.rs/`
-- `https://axios-http.com/`
-
----
-
-## Tips Importantes
-
-✅ **Comienza con mockdata**: Así estableces la estructura y lógica sin depender de la API.
-✅ **Usa Zustand**: Simplifica la gestión de estado comparado con Context API.
-✅ **Commits frecuentes**: Cada paso pequeño merecería su commit (mínimo 30 commits).
-✅ **Testing visual**: Prueba en diferentes tamaños de pantalla mientras desarrollas.
-✅ **Firebase es bonus**: Enfócate primero en que todo funcione con localStorage.
-
-## Información de Interés
-
-- **Documentación de React**: https://react.dev/
-- **Tailwind CSS**: https://tailwindcss.com/
-- **Zustand (State Management)**: https://zustand.docs.pmnd.rs/
-- **Plantillas de Referencia**: https://themewagon.com/
-- **FakeStore API**: https://fakestoreapi.com/ (API perfecta para ecommerce)
-- **Firebase (Bonus)**: https://firebase.google.com/docs
-- **Atomic Design**: https://bradfrost.com/blog/post/atomic-web-design/
-- **Diseño Responsivo**: https://developer.mozilla.org/es/docs/Learn/CSS/CSS_layout/Responsive_Design
 - **Axios (HTTP client)**: https://axios-http.com/
 - **Vite (Build tool)**: https://vitejs.dev/
