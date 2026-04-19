@@ -20,6 +20,7 @@ export default defineConfig({
       '@types': path.resolve(__dirname, './src/types'),
       '@mockdata': path.resolve(__dirname, './src/mockdata'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
+      '@services': path.resolve(__dirname, './src/services'),
     },
   },
   

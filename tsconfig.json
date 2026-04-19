@@ -32,7 +32,8 @@
       "@stores/*": ["src/stores/*"],
       "@types/*": ["src/types/*"],
       "@mockdata/*": ["src/mockdata/*"],
-      "@hooks/*": ["src/hooks/*"]
+      "@hooks/*": ["src/hooks/*"],
+      "@services/*": ["src/services/*"]
     }
   },
   "include": ["src"],
