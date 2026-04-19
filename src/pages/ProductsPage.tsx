@@ -2,14 +2,15 @@ import { FC, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Product, SearchFilters } from '@types/index'
 import ProductCard from '@components/molecules/ProductCard'
-import { useProducts } from '@hooks/index'
+import Pagination from '@components/Pagination'
+import { useProducts, usePagination } from '@hooks/index'
 import apiService from '@services/index'
 
 /**
- * ProductsPage - Página de listado de productos con filtros y API real
+ * ProductsPage - Página de listado de productos con filtros, búsqueda y paginación
  */
 const ProductsPage: FC = () => {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { products, isLoading, error } = useProducts()
   const [categories, setCategories] = useState<string[]>([])
   const [filters, setFilters] = useState<SearchFilters>({
@@ -19,6 +20,22 @@ const ProductsPage: FC = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000])
   const [searchQuery, setSearchQuery] = useState('')
   const [sortedProducts, setSortedProducts] = useState<Product[]>([])
+
+  // Paginación
+  const initialPage = parseInt(searchParams.get('page') || '1')
+  const { currentPage, totalPages, paginatedItems, goToPage } = usePagination({
+    items: sortedProducts,
+    itemsPerPage: 6,
+    initialPage,
+  })
+
+  // Actualizar URL cuando cambia página
+  useEffect(() => {
+    setSearchParams(prev => {
+      prev.set('page', currentPage.toString())
+      return prev
+    })
+  }, [currentPage, setSearchParams])
 
   // Cargar categorías del API
   useEffect(() => {
@@ -71,7 +88,9 @@ const ProductsPage: FC = () => {
     })
 
     setSortedProducts(sorted)
-  }, [products, filters, priceRange, searchQuery])
+    // Reset a página 1 cuando cambian los filtros
+    goToPage(1)
+  }, [products, filters, priceRange, searchQuery, goToPage])
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -184,16 +203,27 @@ const ProductsPage: FC = () => {
             {/* Results Info */}
             {!isLoading && (
               <div className="mb-4 text-sm text-gray-600">
-                Mostrando {sortedProducts.length} de {products.length} productos
+                Mostrando {paginatedItems.length} de {sortedProducts.length} productos (Total: {products.length})
               </div>
             )}
 
             {/* Products List */}
-            {!isLoading && sortedProducts.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sortedProducts.map((product: Product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+            {!isLoading && paginatedItems.length > 0 && (
+              <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {paginatedItems.map((product: Product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={goToPage}
+                  canGoNext={currentPage < totalPages}
+                  canGoPrev={currentPage > 1}
+                />
               </div>
             )}
 
