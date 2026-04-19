@@ -55,29 +55,29 @@ const Pagination: FC<PaginationProps> = ({
   }
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-12 mb-8 flex-wrap">
+    <div className="flex items-center justify-center gap-1 sm:gap-2 mt-8 sm:mt-12 mb-6 sm:mb-8 flex-wrap">
       {/* Botón Anterior */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={!canGoPrev}
-        className={`px-4 py-2 rounded-lg font-semibold transition ${
+        className={`px-2 sm:px-4 py-2 rounded-lg font-semibold transition text-sm sm:text-base ${
           canGoPrev
             ? 'bg-primary text-white hover:bg-blue-700 cursor-pointer'
             : 'bg-gray-300 text-gray-600 cursor-not-allowed opacity-50'
         }`}
       >
-        ← Anterior
+        ← <span className="hidden sm:inline">Anterior</span>
       </button>
 
       {/* Números de página */}
-      <div className="flex gap-1 flex-wrap justify-center">
+      <div className="flex gap-0.5 sm:gap-1 flex-wrap justify-center">
         {generatePageNumbers().map((page, idx) => (
           <button
             key={idx}
             onClick={() => typeof page === 'number' && onPageChange(page)}
             disabled={page === '...'}
             className={`
-              px-3 py-2 rounded-lg font-semibold transition
+              px-2 sm:px-3 py-2 rounded-lg font-semibold transition text-sm
               ${
                 page === '...'
                   ? 'cursor-default text-gray-400'
@@ -96,18 +96,19 @@ const Pagination: FC<PaginationProps> = ({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={!canGoNext}
-        className={`px-4 py-2 rounded-lg font-semibold transition ${
+        className={`px-2 sm:px-4 py-2 rounded-lg font-semibold transition text-sm sm:text-base ${
           canGoNext
             ? 'bg-primary text-white hover:bg-blue-700 cursor-pointer'
             : 'bg-gray-300 text-gray-600 cursor-not-allowed opacity-50'
         }`}
       >
-        Siguiente →
+        <span className="hidden sm:inline">Siguiente</span> →
       </button>
 
       {/* Info de página */}
-      <div className="text-sm text-gray-600 font-semibold ml-4">
-        Página {currentPage} de {totalPages}
+      <div className="text-xs sm:text-sm text-gray-600 font-semibold ml-2 sm:ml-4">
+        <span className="hidden sm:inline">Página {currentPage} de {totalPages}</span>
+        <span className="sm:hidden">{currentPage}/{totalPages}</span>
       </div>
     </div>
   )

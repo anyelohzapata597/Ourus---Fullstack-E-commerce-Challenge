@@ -13,6 +13,7 @@ import apiService from '@services/index'
 const ProductsPage: FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const { products, isLoading, error } = useProducts()
+  const [showFilters, setShowFilters] = useState(false)
   const [categories, setCategories] = useState<string[]>([])
   const [filters, setFilters] = useState<SearchFilters>({
     category: searchParams.get('category') || undefined,
@@ -100,7 +101,9 @@ const ProductsPage: FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-8 animate-fade-in-down">Productos</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 animate-fade-in-down">
+          Productos
+        </h1>
 
         {/* Error State */}
         {error && (
@@ -110,10 +113,21 @@ const ProductsPage: FC = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Mobile Filter Toggle */}
+        <div className="lg:hidden mb-4">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="w-full flex items-center justify-between gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold"
+          >
+            <span>🔍 {showFilters ? 'Ocultar' : 'Mostrar'} Filtros</span>
+            <span className={`transition-transform ${showFilters ? 'rotate-180' : ''}`}>▼</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
           {/* Sidebar Filters */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
+          <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden'} lg:block`}>
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:sticky lg:top-24">
               <h2 className="text-xl font-bold mb-6">Filtros</h2>
 
               {/* Search */}

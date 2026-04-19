@@ -15,14 +15,14 @@ const ItemsPerPageSelector: FC<ItemsPerPageSelectorProps> = ({
   options = [3, 6, 9, 12],
 }) => {
   return (
-    <div className="flex items-center gap-2">
-      <label className="text-sm font-semibold text-gray-600">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2">
+      <label className="text-sm font-semibold text-gray-600 whitespace-nowrap">
         Mostrar por página:
       </label>
       <select
         value={value}
         onChange={(e) => onChange(parseInt(e.target.value))}
-        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white cursor-pointer"
+        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white cursor-pointer text-sm"
       >
         {options.map((opt) => (
           <option key={opt} value={opt}>
