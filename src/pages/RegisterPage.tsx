@@ -1,34 +1,57 @@
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@stores/index'
+import { useNotification } from '@components/NotificationProvider'
 
 interface RegisterForm {
-  fullName: string
+  name: string
   email: string
   password: string
   confirmPassword: string
-  agreeToTerms: boolean
+  terms: boolean
 }
 
 /**
- * RegisterPage - Página de registro
+ * RegisterPage - Página de registro con autenticación funcional
  */
 const RegisterPage: FC = () => {
   const navigate = useNavigate()
+  const { addNotification } = useNotification()
+  const { register, isAuthenticated, error: authError, setError } = useAuthStore()
+
   const [formData, setFormData] = useState<RegisterForm>({
-    fullName: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    agreeToTerms: false,
+    terms: false,
   })
   const [errors, setErrors] = useState<Partial<RegisterForm>>({})
   const [isLoading, setIsLoading] = useState(false)
+  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong'>('weak')
+
+  // Redirect si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated, navigate])
+
+  // Calcular fuerza de contraseña
+  useEffect(() => {
+    const pwd = formData.password
+    if (pwd.length < 6) setPasswordStrength('weak')
+    else if (pwd.length < 10 || !/[A-Z]/.test(pwd)) setPasswordStrength('medium')
+    else setPasswordStrength('strong')
+  }, [formData.password])
 
   const validateForm = (): boolean => {
     const newErrors: Partial<RegisterForm> = {}
 
-    if (!formData.fullName) {
-      newErrors.fullName = 'El nombre es requerido'
+    if (!formData.name.trim()) {
+      newErrors.name = 'El nombre es requerido'
+    } else if (formData.name.length < 3) {
+      newErrors.name = 'El nombre debe tener al menos 3 caracteres'
     }
 
     if (!formData.email) {
@@ -39,16 +62,18 @@ const RegisterPage: FC = () => {
 
     if (!formData.password) {
       newErrors.password = 'La contraseña es requerida'
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'La contraseña debe tener al menos 8 caracteres'
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'La contraseña debe tener al menos 6 caracteres'
     }
 
-    if (formData.password !== formData.confirmPassword) {
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Confirma tu contraseña'
+    } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Las contraseñas no coinciden'
     }
 
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = 'Debes aceptar los términos de servicio'
+    if (!formData.terms) {
+      newErrors.terms = 'Debes aceptar los términos y condiciones'
     }
 
     setErrors(newErrors)
@@ -61,159 +86,225 @@ const RegisterPage: FC = () => {
     if (!validateForm()) return
 
     setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      alert(`¡Bienvenido ${formData.fullName}!`)
+    setError(null)
+
+    try {
+      await register({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        phone: '',
+        address: '',
+        role: 'customer',
+      })
+
+      addNotification(`¡Bienvenido ${formData.name}! Tu cuenta ha sido creada exitosamente.`, 'success', 3000)
       navigate('/')
+    } catch (err) {
+      addNotification('Error al crear la cuenta. Intenta nuevamente.', 'error', 3000)
+    } finally {
       setIsLoading(false)
-    }, 1500)
+    }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'agreeToTerms' ? checked : value,
+      [name]: name === 'terms' ? checked : value,
     }))
+    // Limpiar error del campo cuando cambia
+    if (errors[name as keyof RegisterForm]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: undefined,
+      }))
+    }
+  }
+
+  const getStrengthColor = () => {
+    switch (passwordStrength) {
+      case 'weak':
+        return 'bg-red-500'
+      case 'medium':
+        return 'bg-yellow-500'
+      case 'strong':
+        return 'bg-green-500'
+      default:
+        return 'bg-gray-300'
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold mb-2 text-center">Crear Cuenta</h1>
-        <p className="text-center text-gray-600 mb-8">Únete a nuestra comunidad</p>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 flex items-center justify-center py-12 px-4">
+      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md animate-fade-in">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-2 text-secondary">✨ Registro</h1>
+          <p className="text-gray-600">Crea tu cuenta y comienza a comprar</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Full Name */}
+        {/* Error General */}
+        {authError && (
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+            {authError}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Nombre Completo</label>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Nombre Completo
+            </label>
             <input
               type="text"
-              name="fullName"
-              value={formData.fullName}
+              name="name"
+              value={formData.name}
               onChange={handleInputChange}
               placeholder="Juan Pérez"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-                errors.fullName ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition ${
+                errors.name ? 'border-red-500' : 'border-gray-300'
               }`}
+              disabled={isLoading}
             />
-            {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Email</label>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
               placeholder="tu@email.com"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition ${
                 errors.email ? 'border-red-500' : 'border-gray-300'
               }`}
+              disabled={isLoading}
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Contraseña</label>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Contraseña
+            </label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleInputChange}
               placeholder="••••••••"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition ${
                 errors.password ? 'border-red-500' : 'border-gray-300'
               }`}
+              disabled={isLoading}
             />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-            <p className="text-xs text-gray-600 mt-1">Mínimo 8 caracteres</p>
+            {formData.password && (
+              <div className="mt-2">
+                <div className="flex gap-1">
+                  <div className={`flex-1 h-2 rounded ${getStrengthColor()} opacity-50`}></div>
+                  <div className={`flex-1 h-2 rounded ${getStrengthColor()} ${passwordStrength !== 'weak' ? 'opacity-100' : 'opacity-20'}`}></div>
+                  <div className={`flex-1 h-2 rounded ${getStrengthColor()} ${passwordStrength === 'strong' ? 'opacity-100' : 'opacity-20'}`}></div>
+                </div>
+                <p className="text-xs mt-1 text-gray-600">
+                  Fortaleza: <span className={`font-bold ${passwordStrength === 'weak' ? 'text-red-500' : passwordStrength === 'medium' ? 'text-yellow-500' : 'text-green-500'}`}>
+                    {passwordStrength === 'weak' ? 'Débil' : passwordStrength === 'medium' ? 'Media' : 'Fuerte'}
+                  </span>
+                </p>
+              </div>
+            )}
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Confirmar Contraseña</label>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Confirmar Contraseña
+            </label>
             <input
               type="password"
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleInputChange}
               placeholder="••••••••"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition ${
                 errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
               }`}
+              disabled={isLoading}
             />
-            {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+            {formData.password && formData.confirmPassword && (
+              <p className={`text-sm mt-1 ${formData.password === formData.confirmPassword ? 'text-green-500' : 'text-red-500'}`}>
+                {formData.password === formData.confirmPassword ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas no coinciden'}
+              </p>
+            )}
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+            )}
           </div>
 
-          {/* Terms Agreement */}
-          <div className="flex items-start">
+          {/* Terms & Conditions */}
+          <div className="flex items-start gap-2">
             <input
               type="checkbox"
-              name="agreeToTerms"
-              checked={formData.agreeToTerms}
+              id="terms"
+              name="terms"
+              checked={formData.terms}
               onChange={handleInputChange}
-              className="w-4 h-4 text-primary mt-1"
+              className="w-4 h-4 text-secondary rounded focus:ring-2 focus:ring-secondary mt-1"
+              disabled={isLoading}
             />
-            <label className="ml-2 text-sm text-gray-700">
+            <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
               Acepto los{' '}
-              <Link to="/terms" className="text-primary hover:underline">
-                términos de servicio
-              </Link>
-              {' '}y la{' '}
-              <Link to="#" className="text-primary hover:underline">
-                política de privacidad
+              <Link to="/terms" className="text-secondary font-bold hover:underline">
+                términos y condiciones
               </Link>
             </label>
           </div>
-          {errors.agreeToTerms && <p className="text-red-500 text-sm">{errors.agreeToTerms}</p>}
+          {errors.terms && (
+            <p className="text-red-500 text-sm">{errors.terms}</p>
+          )}
 
-          {/* Submit */}
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+            className="w-full bg-secondary text-white font-bold py-2 rounded-lg hover:bg-purple-700 disabled:bg-gray-400 transition duration-200 flex items-center justify-center gap-2 mt-6"
           >
-            {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
+            {isLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Creando cuenta...
+              </>
+            ) : (
+              '✨ Registrarse'
+            )}
           </button>
-
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-600">O</span>
-            </div>
-          </div>
-
-          {/* Social Signup */}
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              type="button"
-              className="border border-gray-300 rounded-lg py-2 hover:bg-gray-50 transition-colors"
-            >
-              <span className="text-xl">f</span>
-            </button>
-            <button
-              type="button"
-              className="border border-gray-300 rounded-lg py-2 hover:bg-gray-50 transition-colors"
-            >
-              <span className="text-xl">G</span>
-            </button>
-          </div>
         </form>
 
         {/* Login Link */}
-        <p className="text-center mt-8 text-gray-600">
-          ¿Ya tienes cuenta?{' '}
-          <Link to="/auth/login" className="text-primary font-bold hover:underline">
-            Inicia sesión
-          </Link>
-        </p>
+        <div className="text-center mt-6">
+          <p className="text-gray-600 text-sm">
+            ¿Ya tienes cuenta?{' '}
+            <Link
+              to="/auth/login"
+              className="text-secondary font-bold hover:underline"
+            >
+              Inicia sesión
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

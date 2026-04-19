@@ -1,5 +1,7 @@
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@stores/index'
+import { useNotification } from '@components/NotificationProvider'
 
 interface LoginForm {
   email: string
@@ -8,10 +10,13 @@ interface LoginForm {
 }
 
 /**
- * LoginPage - Página de inicio de sesión
+ * LoginPage - Página de inicio de sesión con autenticación funcional
  */
 const LoginPage: FC = () => {
   const navigate = useNavigate()
+  const { addNotification } = useNotification()
+  const { login, isAuthenticated, error: authError, setError } = useAuthStore()
+
   const [formData, setFormData] = useState<LoginForm>({
     email: '',
     password: '',
@@ -19,6 +24,13 @@ const LoginPage: FC = () => {
   })
   const [errors, setErrors] = useState<Partial<LoginForm>>({})
   const [isLoading, setIsLoading] = useState(false)
+
+  // Redirect si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated, navigate])
 
   const validateForm = (): boolean => {
     const newErrors: Partial<LoginForm> = {}
@@ -45,12 +57,35 @@ const LoginPage: FC = () => {
     if (!validateForm()) return
 
     setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      alert(`Bienvenido ${formData.email}!`)
+    setError(null)
+
+    try {
+      // Mock authentication - en producción sería con API
+      const mockUser = {
+        id: Date.now().toString(),
+        email: formData.email,
+        name: formData.email.split('@')[0],
+        role: 'customer' as const,
+      }
+
+      await login(formData.email, formData.password)
+
+      // Guardar remember me
+      if (formData.rememberMe) {
+        localStorage.setItem('rememberMe', 'true')
+        localStorage.setItem('rememberEmail', formData.email)
+      } else {
+        localStorage.removeItem('rememberMe')
+        localStorage.removeItem('rememberEmail')
+      }
+
+      addNotification(`¡Bienvenido ${mockUser.name}!`, 'success', 3000)
       navigate('/')
+    } catch (err) {
+      addNotification('Error al iniciar sesión. Verifica tus credenciales.', 'error', 3000)
+    } finally {
       setIsLoading(false)
-    }, 1500)
+    }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,109 +94,148 @@ const LoginPage: FC = () => {
       ...prev,
       [name]: name === 'rememberMe' ? checked : value,
     }))
+    // Limpiar error del campo cuando cambia
+    if (errors[name as keyof LoginForm]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: undefined,
+      }))
+    }
   }
+
+  // Cargar email si hay remember me
+  useEffect(() => {
+    const rememberMe = localStorage.getItem('rememberMe')
+    const rememberEmail = localStorage.getItem('rememberEmail')
+    if (rememberMe && rememberEmail) {
+      setFormData(prev => ({
+        ...prev,
+        email: rememberEmail,
+        rememberMe: true,
+      }))
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold mb-2 text-center">Bienvenido</h1>
-        <p className="text-center text-gray-600 mb-8">Inicia sesión en tu cuenta</p>
+      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md animate-fade-in">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-2 text-primary">🔐 Login</h1>
+          <p className="text-gray-600">Inicia sesión en tu cuenta</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Error General */}
+        {authError && (
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+            {authError}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Email */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Email</label>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder="tu@email.com"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+              placeholder="ejemplo@email.com"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition ${
                 errors.email ? 'border-red-500' : 'border-gray-300'
               }`}
+              disabled={isLoading}
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Contraseña</label>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Contraseña
+            </label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleInputChange}
               placeholder="••••••••"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition ${
                 errors.password ? 'border-red-500' : 'border-gray-300'
               }`}
+              disabled={isLoading}
             />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
 
           {/* Remember Me */}
           <div className="flex items-center">
             <input
               type="checkbox"
+              id="rememberMe"
               name="rememberMe"
               checked={formData.rememberMe}
               onChange={handleInputChange}
-              className="w-4 h-4 text-primary"
+              className="w-4 h-4 text-primary rounded focus:ring-2 focus:ring-primary"
+              disabled={isLoading}
             />
-            <label className="ml-2 text-sm text-gray-700">Recuérdame</label>
+            <label
+              htmlFor="rememberMe"
+              className="ml-2 text-sm text-gray-600 cursor-pointer"
+            >
+              Recuérdame en este dispositivo
+            </label>
           </div>
 
-          {/* Submit */}
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+            className="w-full bg-primary text-white font-bold py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition duration-200 flex items-center justify-center gap-2"
           >
-            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            {isLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Iniciando sesión...
+              </>
+            ) : (
+              '✓ Iniciar Sesión'
+            )}
           </button>
-
-          {/* Forgot Password */}
-          <div className="text-center">
-            <Link to="#" className="text-primary hover:underline text-sm">
-              ¿Olvidaste tu contraseña?
-            </Link>
-          </div>
-
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-600">O</span>
-            </div>
-          </div>
-
-          {/* Social Login */}
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              type="button"
-              className="border border-gray-300 rounded-lg py-2 hover:bg-gray-50 transition-colors"
-            >
-              <span className="text-xl">f</span>
-            </button>
-            <button
-              type="button"
-              className="border border-gray-300 rounded-lg py-2 hover:bg-gray-50 transition-colors"
-            >
-              <span className="text-xl">G</span>
-            </button>
-          </div>
         </form>
 
-        {/* Sign Up Link */}
-        <p className="text-center mt-8 text-gray-600">
-          ¿No tienes cuenta?{' '}
-          <Link to="/auth/register" className="text-primary font-bold hover:underline">
-            Regístrate aquí
-          </Link>
-        </p>
+        {/* Divider */}
+        <div className="my-6 flex items-center gap-4">
+          <div className="flex-1 border-t border-gray-300"></div>
+          <span className="text-gray-500 text-sm">o</span>
+          <div className="flex-1 border-t border-gray-300"></div>
+        </div>
+
+        {/* Demo Credentials */}
+        <div className="mb-6 p-4 bg-blue-50 rounded-lg text-sm">
+          <p className="font-semibold text-gray-700 mb-2">👤 Credenciales de prueba:</p>
+          <p className="text-gray-600">Email: <code className="bg-white px-2 py-1 rounded">demo@email.com</code></p>
+          <p className="text-gray-600">Contraseña: <code className="bg-white px-2 py-1 rounded">demo123</code></p>
+        </div>
+
+        {/* Register Link */}
+        <div className="text-center">
+          <p className="text-gray-600 text-sm">
+            ¿No tienes cuenta?{' '}
+            <Link
+              to="/auth/register"
+              className="text-primary font-bold hover:underline"
+            >
+              Regístrate aquí
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )
