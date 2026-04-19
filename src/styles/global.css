@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Importar animaciones */
+@import './animations.css';
+
 /* Reset y estilos base */
 * {
   margin: 0;
@@ -20,19 +23,22 @@ body {
   line-height: 1.6;
 }
 
-/* Tipografía base */
+/* Tipografía base con transiciones suaves */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 0.5em;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 h1 {
   font-size: 2.25rem;
+  animation: fadeInDown 0.8s ease-out;
 }
 
 h2 {
   font-size: 1.875rem;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 h3 {
@@ -41,46 +47,90 @@ h3 {
 
 p {
   margin-bottom: 1rem;
+  animation: fadeIn 0.5s ease-out;
 }
 
+/* Links con efecto subrayado animado */
 a {
   color: #3B82F6;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+  position: relative;
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -3px;
+  left: 0;
+  background-color: #3B82F6;
+  transition: width 0.3s ease;
 }
 
 a:hover {
   color: #1e40af;
 }
 
-/* Imágenes responsivas */
+a:hover::after {
+  width: 100%;
+}
+
+/* Imágenes responsivas con transición suave */
 img {
   max-width: 100%;
   height: auto;
   display: block;
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-/* Botones base */
+img:hover {
+  transform: scale(1.05);
+}
+
+/* Botones base con micro-interacciones */
 button {
   cursor: pointer;
   border: none;
   font-family: inherit;
   font-size: inherit;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+button:active {
+  transform: translateY(0);
 }
 
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* Inputs */
+/* Inputs con animaciones de foco */
 input, textarea, select {
   font-family: inherit;
   font-size: inherit;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
 }
 
-/* Scroll */
+input:focus, textarea:focus, select:focus {
+  transform: scale(1.01);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #3B82F6;
+  outline: none;
+}
+
+/* Scroll personalizado */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -93,6 +143,7 @@ input, textarea, select {
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
+  transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
