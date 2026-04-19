@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, memo } from 'react'
 import { useCartStore } from '@stores/index'
 import { Product } from '@types/index'
 
@@ -8,9 +8,9 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard - Tarjeta de producto con integración a CartStore
+ * ProductCard - Tarjeta de producto optimizado con React.memo
  */
-const ProductCard: FC<ProductCardProps> = ({ product, onAddToCart }) => {
+const ProductCard: FC<ProductCardProps> = memo(({ product, onAddToCart }) => {
   const { addItem } = useCartStore()
   const discount = Math.round((20 / product.price) * 100); // Ejemplo de cálculo
   
@@ -39,6 +39,7 @@ const ProductCard: FC<ProductCardProps> = ({ product, onAddToCart }) => {
           src={product.image}
           alt={product.title}
           className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+          loading="lazy"
         />
         {discount > 0 && (
           <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-lg text-sm font-bold animate-pulse-custom">
@@ -91,7 +92,9 @@ const ProductCard: FC<ProductCardProps> = ({ product, onAddToCart }) => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}, (prevProps, nextProps) => prevProps.product.id === nextProps.product.id)
 
-export default ProductCard;
+ProductCard.displayName = 'ProductCard'
+
+export default ProductCard
