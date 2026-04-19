@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Product, SearchFilters } from '@types/index'
 import ProductCard from '@components/molecules/ProductCard'
 import Pagination from '@components/Pagination'
+import ItemsPerPageSelector from '@components/ItemsPerPageSelector'
 import { useProducts, usePagination } from '@hooks/index'
 import apiService from '@services/index'
 
@@ -20,22 +21,26 @@ const ProductsPage: FC = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000])
   const [searchQuery, setSearchQuery] = useState('')
   const [sortedProducts, setSortedProducts] = useState<Product[]>([])
+  const [itemsPerPage, setItemsPerPage] = useState(
+    parseInt(searchParams.get('itemsPerPage') || '6')
+  )
 
   // Paginación
   const initialPage = parseInt(searchParams.get('page') || '1')
   const { currentPage, totalPages, paginatedItems, goToPage } = usePagination({
     items: sortedProducts,
-    itemsPerPage: 6,
+    itemsPerPage,
     initialPage,
   })
 
-  // Actualizar URL cuando cambia página
+  // Actualizar URL cuando cambia página o items por página
   useEffect(() => {
     setSearchParams(prev => {
       prev.set('page', currentPage.toString())
+      prev.set('itemsPerPage', itemsPerPage.toString())
       return prev
     })
-  }, [currentPage, setSearchParams])
+  }, [currentPage, itemsPerPage, setSearchParams])
 
   // Cargar categorías del API
   useEffect(() => {
@@ -200,10 +205,19 @@ const ProductsPage: FC = () => {
               </div>
             )}
 
-            {/* Results Info */}
+            {/* Results Controls */}
             {!isLoading && (
-              <div className="mb-4 text-sm text-gray-600">
-                Mostrando {paginatedItems.length} de {sortedProducts.length} productos (Total: {products.length})
+              <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                <div className="text-sm text-gray-600">
+                  Mostrando {paginatedItems.length} de {sortedProducts.length} productos (Total: {products.length})
+                </div>
+                <ItemsPerPageSelector
+                  value={itemsPerPage}
+                  onChange={(value) => {
+                    setItemsPerPage(value)
+                    goToPage(1)
+                  }}
+                />
               </div>
             )}
 
