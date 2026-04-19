@@ -31,7 +31,8 @@
       "@styles/*": ["src/styles/*"],
       "@stores/*": ["src/stores/*"],
       "@types/*": ["src/types/*"],
-      "@mockdata/*": ["src/mockdata/*"]
+      "@mockdata/*": ["src/mockdata/*"],
+      "@hooks/*": ["src/hooks/*"]
     }
   },
   "include": ["src"],
