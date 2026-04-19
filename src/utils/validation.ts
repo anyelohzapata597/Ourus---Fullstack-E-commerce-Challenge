@@ -59,7 +59,7 @@ export const validateEmail = (email: string): string | null => {
  * Valida contraseña
  * Requerimientos: 8+ caracteres, mayúscula, minúscula, número, símbolo especial
  */
-export const validatePassword = (password: string, includeStrength = true): string | null => {
+export const validatePassword = (password: string, _includeStrength = true): string | null => {
   if (!password) return 'Contraseña es requerida'
   if (password.length < 8) {
     return 'Contraseña debe tener al menos 8 caracteres'

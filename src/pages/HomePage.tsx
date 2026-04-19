@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import { Link } from 'react-router-dom'
 import mockProducts from '@mockdata/products'
 import ProductCard from '@components/molecules/ProductCard'

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import { User } from '@types/index'
+import type { User } from '../types'
 
 interface AuthStore {
   user: User | null
@@ -28,7 +28,7 @@ export const useAuthStore = create<AuthStore>()(
         isLoading: false,
         error: null,
 
-        login: async (email: string, password: string) => {
+        login: async (email: string, _password: string) => {
           set({ isLoading: true, error: null })
           try {
             // Simulate API call
@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthStore>()(
 
             // Mock user
             const mockUser: User = {
-              id: Math.floor(Math.random() * 1000),
+              id: String(Math.floor(Math.random() * 1000)),
               name: email.split('@')[0],
               email,
               phone: '+1 (555) 123-4567',
@@ -65,7 +65,7 @@ export const useAuthStore = create<AuthStore>()(
             await new Promise(resolve => setTimeout(resolve, 1500))
 
             const newUser: User = {
-              id: Math.floor(Math.random() * 1000),
+              id: String(Math.floor(Math.random() * 1000)),
               name: userData.name || 'User',
               email: userData.email || '',
               phone: userData.phone || '',

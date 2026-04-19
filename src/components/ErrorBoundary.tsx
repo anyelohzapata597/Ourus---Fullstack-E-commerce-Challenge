@@ -1,4 +1,4 @@
-import { FC, ReactNode, ErrorInfo } from 'react'
+import { Component, ReactNode, ErrorInfo } from 'react'
 
 interface Props {
   children: ReactNode
@@ -12,7 +12,7 @@ interface State {
 /**
  * ErrorBoundary - Componente para capturar errores en el árbol de componentes
  */
-class ErrorBoundary extends FC<Props> {
+class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { hasError: false, error: null }
@@ -27,7 +27,7 @@ class ErrorBoundary extends FC<Props> {
   }
 
   render() {
-    const { hasError, error } = this.state as State
+    const { hasError, error } = this.state
 
     if (hasError) {
       return (

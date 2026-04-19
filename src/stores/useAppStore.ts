@@ -1,6 +1,6 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { AppState, Notification } from '@types/index';
+import type { AppState, Notification } from '../types';
 
 /**
  * App Store - Estado global de la aplicación
@@ -24,13 +24,13 @@ const useAppStore = create<AppStore>()(
         notification: null,
 
         // Acciones
-        setLoading: (isLoading) => set({ isLoading }),
+        setLoading: (isLoading: boolean) => set({ isLoading }),
         
-        setError: (error) => set({ error }),
+        setError: (error: string | null) => set({ error }),
         
-        setNotification: (notification) => set({ notification }),
+        setNotification: (notification: Notification | null) => set({ notification }),
         
-        showNotification: (message, type, duration = 3000) => {
+        showNotification: (message: string, type: 'success' | 'error' | 'warning' | 'info', duration = 3000) => {
           const id = `notif-${Date.now()}`;
           const notification: Notification = {
             id,
@@ -44,7 +44,7 @@ const useAppStore = create<AppStore>()(
           
           if (duration && duration > 0) {
             setTimeout(() => {
-              set((state) => 
+              set((state: AppStore) => 
                 state.notification?.id === id ? { notification: null } : {}
               );
             }, duration);
@@ -66,4 +66,4 @@ const useAppStore = create<AppStore>()(
   )
 );
 
-export default useAppStore;
+export { useAppStore };

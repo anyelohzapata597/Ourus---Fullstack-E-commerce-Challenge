@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Product, SearchFilters } from '@types/index'
+import type { Product, SearchFilters } from '../types'
 import ProductCard from '@components/molecules/ProductCard'
 import Pagination from '@components/Pagination'
 import ItemsPerPageSelector from '@components/ItemsPerPageSelector'

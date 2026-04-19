@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Product, SearchFilters } from '@types/index'
+import type { Product, SearchFilters } from '../types'
 import apiService, { APIError } from '@services/index'
 import { useAppStore } from '@stores/index'
 

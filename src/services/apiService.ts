@@ -3,7 +3,7 @@
  * Endpoints públicos: https://fakestoreapi.com
  */
 
-import { Product, SearchFilters } from '@types/index'
+import type { Product, SearchFilters } from '../types'
 
 const API_BASE_URL = 'https://fakestoreapi.com'
 
@@ -22,11 +22,6 @@ interface FakeStoreProduct {
     rate: number
     count: number
   }
-}
-
-interface FakeStoreCategory {
-  id?: number
-  name: string
 }
 
 /**
@@ -244,7 +239,7 @@ export const apiService = {
   /**
    * Simular compra (mock - no data persistence)
    */
-  async checkout(cartItems: any[], shippingAddress: any): Promise<{ orderId: string }> {
+  async checkout(_cartItems: any[], _shippingAddress: any): Promise<{ orderId: string }> {
     try {
       // Simular delay de procesamiento
       await new Promise(resolve => setTimeout(resolve, 1500))

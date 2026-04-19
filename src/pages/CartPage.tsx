@@ -58,7 +58,6 @@ const CartPage: FC = () => {
                     <Link to={`/products/${item.id}`} className="hover:text-primary transition">
                       <h3 className="font-bold text-lg mb-2">{item.title}</h3>
                     </Link>
-                    <p className="text-gray-600 text-sm mb-4">{item.category}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold text-primary">${item.price.toFixed(2)}</span>
                       <span className="text-sm text-gray-500">Subtotal: ${(item.price * item.quantity).toFixed(2)}</span>

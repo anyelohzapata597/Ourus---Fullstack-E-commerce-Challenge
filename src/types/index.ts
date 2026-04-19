@@ -119,17 +119,3 @@ export interface ApiResponse<T> {
   error?: string;
   timestamp: Date;
 }
-
-export default {
-  Product,
-  Rating,
-  CartItem,
-  User,
-  Order,
-  ShippingAddress,
-  PaymentMethod,
-  SearchFilters,
-  Notification,
-  AppState,
-  ApiResponse,
-};

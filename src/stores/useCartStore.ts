@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import { CartItem } from '@types/index'
+import type { CartItem } from '../types'
 
 interface CartStore {
   items: CartItem[]

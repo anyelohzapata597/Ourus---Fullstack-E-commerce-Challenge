@@ -1,6 +1,5 @@
 import { RouteObject } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
-import Spinner from '@components/atoms/Spinner';
 
 // Pages - Lazy loading para code splitting
 const HomePage = lazy(() => import('@pages/HomePage'));
@@ -18,15 +17,15 @@ const NotFoundPage = lazy(() => import('@pages/NotFoundPage'));
 // Layouts
 const MainLayout = lazy(() => import('@components/layouts/MainLayout'));
 
-// Loading Fallback
+// Loading Fallback - Spinner inline
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center">
-    <Spinner />
+    <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
   </div>
 );
 
 // Wrapper para Suspense
-const withSuspense = (Component: React.LazyExoticComponent<() => JSX.Element>) => (
+const withSuspense = (Component: any) => (
   <Suspense fallback={<PageLoader />}>
     <Component />
   </Suspense>

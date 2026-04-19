@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react'
-import { Button, Rating, Price } from './atoms'
-import { Product, CartItem } from '@types/index'
+import { Price } from '../atoms/atoms'
+import type { CartItem } from '../../types'
 
 /**
  * ========== INTERFACES ==========

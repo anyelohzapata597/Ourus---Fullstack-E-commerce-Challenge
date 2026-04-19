@@ -1,6 +1,6 @@
 import { FC, memo } from 'react'
 import { useCartStore } from '@stores/index'
-import { Product } from '@types/index'
+import type { Product } from '../../types'
 
 interface ProductCardProps {
   product: Product;
@@ -22,9 +22,6 @@ const ProductCard: FC<ProductCardProps> = memo(({ product, onAddToCart }) => {
       price: product.price,
       image: product.image,
       quantity: 1,
-      category: product.category,
-      rating: product.rating,
-      description: product.description,
       subtotal: product.price,
     })
     // Optional callback

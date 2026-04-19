@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import mockProducts from '@mockdata/products'
-import { Product, Rating } from '@types/index'
+import type { Product } from '../types'
 
 /**
  * ProductDetailPage - Detalles completos de un producto

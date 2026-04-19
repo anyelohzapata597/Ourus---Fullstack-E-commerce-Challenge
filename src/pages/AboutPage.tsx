@@ -1,5 +1,4 @@
 import { FC } from 'react'
-import { Link } from 'react-router-dom'
 
 /**
  * AboutPage - Página de información sobre la empresa

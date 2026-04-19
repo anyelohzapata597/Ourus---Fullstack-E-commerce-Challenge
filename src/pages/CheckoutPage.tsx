@@ -17,6 +17,7 @@ interface CheckoutForm {
   shippingMethod: 'standard' | 'express' | 'overnight'
   paymentMethod: 'credit' | 'debit' | 'paypal'
   cardNumber: string
+  cardholderName: string
   expiryDate: string
   cvv: string
 }
@@ -44,8 +45,6 @@ const CheckoutPage: FC = () => {
     touched,
     handleChange,
     handleBlur,
-    setFieldValue,
-    setFieldError,
   } = useFormValidation({
     initialValues: {
       firstName: '',
@@ -59,6 +58,7 @@ const CheckoutPage: FC = () => {
       shippingMethod: 'standard',
       paymentMethod: 'credit',
       cardNumber: '',
+      cardholderName: '',
       expiryDate: '',
       cvv: '',
     } as CheckoutForm,
@@ -77,6 +77,7 @@ const CheckoutPage: FC = () => {
       } else if (currentStep === 'payment') {
         return validatePaymentForm({
           cardNumber: vals.cardNumber,
+          cardholderName: vals.cardholderName,
           expiryDate: vals.expiryDate,
           cvv: vals.cvv,
         })
@@ -92,21 +93,21 @@ const CheckoutPage: FC = () => {
         // Process checkout
         setIsProcessing(true)
         try {
-          const orderId = await apiService.checkout(items, {
+          const result = await apiService.checkout(items, {
             address: formValues.address,
             city: formValues.city,
             state: formValues.state,
             zipCode: formValues.zipCode,
           })
-          setOrderConfirmed(orderId)
+          setOrderConfirmed(result.orderId)
           clearCart()
           setTimeout(() => {
             navigate('/products')
-            alert('¡Pedido confirmado! Número: ' + orderId)
+            alert('¡Pedido confirmado! Número: ' + result.orderId)
           }, 2000)
         } catch (error) {
-          setFieldError('general', 'Error al procesar el pago')
           setIsProcessing(false)
+          alert('Error al procesar el pago. Por favor intenta nuevamente.')
         }
       }
     },

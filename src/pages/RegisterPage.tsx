@@ -73,7 +73,7 @@ const RegisterPage: FC = () => {
     }
 
     if (!formData.terms) {
-      newErrors.terms = 'Debes aceptar los términos y condiciones'
+      newErrors.terms = 'Debes aceptar los términos y condiciones' as any
     }
 
     setErrors(newErrors)
@@ -91,7 +91,6 @@ const RegisterPage: FC = () => {
     try {
       await register({
         email: formData.email,
-        password: formData.password,
         name: formData.name,
         phone: '',
         address: '',

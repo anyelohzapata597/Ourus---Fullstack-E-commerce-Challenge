@@ -1,4 +1,4 @@
-import { Product } from '@types/index'
+import type { Product } from '../types'
 
 /**
  * Mock Products Data - TypeScript
