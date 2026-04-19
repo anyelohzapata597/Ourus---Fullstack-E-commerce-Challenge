@@ -1,9 +1,9 @@
-# 🛍️ Reto Desarrollador Fullstack
+# 🛍️ ShopHub - E-Commerce Full Stack
 
-Reto para practicar las habilidades de un desarrollador fullstack moderno.
+Proyecto de e-commerce desarrollado con **Document-Driven Development (DDD)** usando React y Tailwind CSS.
 
-> Este repositorio es el punto de partida. Clona este proyecto y usa su contenido como base para desarrollar paso a paso.
-> Trabaja con commits pequeños y claros desde aquí.
+**Fase 1 Status**: ✅ COMPLETADA (7/12 commits)  
+**Próxima Fase**: React Router + TypeScript + Zustand
 
 ## <img src="https://flagcdn.com/w40/co.png" width="30"> Menú de contenido
 
