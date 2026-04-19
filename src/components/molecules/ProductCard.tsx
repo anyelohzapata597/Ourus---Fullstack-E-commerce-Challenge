@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { useCartStore } from '@stores/index'
 import { Product } from '@types/index'
 
 interface ProductCardProps {
@@ -7,10 +8,28 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard - Tarjeta de producto
+ * ProductCard - Tarjeta de producto con integración a CartStore
  */
 const ProductCard: FC<ProductCardProps> = ({ product, onAddToCart }) => {
+  const { addItem } = useCartStore()
   const discount = Math.round((20 / product.price) * 100); // Ejemplo de cálculo
+  
+  const handleAddToCart = () => {
+    // Add to Zustand cart store
+    addItem({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      image: product.image,
+      quantity: 1,
+      category: product.category,
+      rating: product.rating,
+      description: product.description,
+      subtotal: product.price,
+    })
+    // Optional callback
+    onAddToCart?.(product)
+  }
   
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow hover-lift overflow-hidden">
@@ -65,10 +84,10 @@ const ProductCard: FC<ProductCardProps> = ({ product, onAddToCart }) => {
 
         {/* Button */}
         <button
-          onClick={() => onAddToCart?.(product)}
+          onClick={handleAddToCart}
           className="w-full bg-primary text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors hover-lift"
         >
-          Agregar al Carrito
+          🛒 Agregar al Carrito
         </button>
       </div>
     </div>

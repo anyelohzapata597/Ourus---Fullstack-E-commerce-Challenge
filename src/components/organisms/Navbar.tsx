@@ -1,19 +1,21 @@
 import { useState, FC } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useCartStore } from '@stores/index'
 
 /**
- * Navbar - Navegación principal con React Router
+ * Navbar - Navegación principal con React Router y Cart integration
  */
 const Navbar: FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { pathname } = useLocation();
+  const { getItemCount } = useCartStore();
+  const itemCount = getItemCount();
 
   const isActive = (path: string) => pathname === path;
 
   const navLinks = [
     { path: '/', label: 'Inicio' },
     { path: '/products', label: 'Productos' },
-    { path: '/cart', label: '🛒 Carrito' },
     { path: '/about', label: 'Acerca de' },
   ];
 
@@ -41,6 +43,22 @@ const Navbar: FC = () => {
                 {link.label}
               </Link>
             ))}
+            {/* Cart Link with Badge */}
+            <Link
+              to="/cart"
+              className={`relative font-semibold transition-colors ${
+                isActive('/cart')
+                  ? 'text-primary'
+                  : 'text-gray-700 hover:text-primary'
+              }`}
+            >
+              🛒 Carrito
+              {itemCount > 0 && (
+                <span className="absolute -top-2 -right-4 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
             <Link
               to="/auth/login"
               className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -87,6 +105,23 @@ const Navbar: FC = () => {
                 {link.label}
               </Link>
             ))}
+            {/* Mobile Cart */}
+            <Link
+              to="/cart"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`block py-2 px-4 relative ${
+                isActive('/cart')
+                  ? 'text-primary font-bold'
+                  : 'text-gray-700 hover:text-primary'
+              }`}
+            >
+              🛒 Carrito
+              {itemCount > 0 && (
+                <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
             <Link
               to="/auth/login"
               onClick={() => setIsMobileMenuOpen(false)}
