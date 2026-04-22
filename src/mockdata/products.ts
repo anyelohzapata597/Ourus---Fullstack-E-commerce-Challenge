@@ -1,13 +1,12 @@
-import type { Product } from '../types'
-
 /**
- * Mock Products Data - TypeScript
- * Estructura basada en FakeStore API
- * 4 categorías: electronics, jewelery, men's clothing, women's clothing
- * ~12 productos por categoría = 48 productos totales
+ * 🎯 Datos Mock de Productos
+ * 48 productos distribuidos en 4 categorías
+ * Usado en FASE 1-2, migrado a Firestore en FASE 3
  */
 
-const mockProducts: Product[] = [
+import { Product } from '../types/product';
+
+export const MOCK_PRODUCTS: Product[] = [
   // ===== ELECTRONICS (12) =====
   {
     id: 1,

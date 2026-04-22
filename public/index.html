@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ShopHub - Tu tienda online de confianza con productos electrónicos, moda, hogar y deportes">
+    <title>ShopHub - Tienda Online</title>
+    
+    <!-- CSS System -->
+    <link rel="stylesheet" href="../src/styles/variables.css">
+    <link rel="stylesheet" href="../src/styles/global.css">
+    <link rel="stylesheet" href="../src/styles/components.css">
+    <link rel="stylesheet" href="../src/styles/responsive.css">
+    <link rel="stylesheet" href="../src/styles/animations.css">
+    
+    <!-- Custom styles for index -->
+    <style>
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: var(--color-white);
+            padding: var(--spacing-20) var(--spacing-4);
+            text-align: center;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-content h1 {
+            font-size: var(--font-size-5xl);
+            margin-bottom: var(--spacing-4);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero-content p {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-8);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero .btn {
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        /* Featured Section */
+        .featured {
+            padding: var(--spacing-20) var(--spacing-4);
+            background-color: var(--color-gray-50);
+        }
+
+        .featured h2 {
+            text-align: center;
+            margin-bottom: var(--spacing-12);
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-6);
+            margin-bottom: var(--spacing-20);
+        }
+
+        .category-card {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-6);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .category-card h3 {
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .category-card p {
+            color: var(--color-gray-500);
+            font-size: var(--font-size-sm);
+        }
+
+        /* Products Preview */
+        .products-preview {
+            padding: var(--spacing-20) var(--spacing-4);
+        }
+
+        .products-preview h2 {
+            text-align: center;
+            margin-bottom: var(--spacing-12);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--spacing-6);
+            margin-bottom: var(--spacing-12);
+        }
+
+        .product-card {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-gray-400);
+            font-size: var(--font-size-4xl);
+            overflow: hidden;
+        }
+
+        .product-info {
+            padding: var(--spacing-4);
+        }
+
+        .product-category {
+            font-size: var(--font-size-xs);
+            color: var(--color-primary);
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .product-title {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-2);
+            min-height: 2.4em;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            margin-bottom: var(--spacing-2);
+            font-size: var(--font-size-sm);
+        }
+
+        .stars {
+            color: #FFC107;
+        }
+
+        .product-price {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .product-card .btn {
+            width: 100%;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: var(--color-white);
+            padding: var(--spacing-16) var(--spacing-4);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-8);
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: var(--font-size-4xl);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .stat-item p {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: var(--spacing-20) var(--spacing-4);
+            background-color: var(--color-gray-50);
+        }
+
+        .testimonials h2 {
+            text-align: center;
+            margin-bottom: var(--spacing-12);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-6);
+        }
+
+        .testimonial {
+            background: var(--color-white);
+            padding: var(--spacing-6);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .testimonial-stars {
+            color: #FFC107;
+            margin-bottom: var(--spacing-3);
+            font-size: var(--font-size-lg);
+        }
+
+        .testimonial-text {
+            color: var(--color-gray-700);
+            margin-bottom: var(--spacing-4);
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-gray-900);
+        }
+
+        .testimonial-role {
+            color: var(--color-gray-500);
+            font-size: var(--font-size-sm);
+        }
+
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: var(--color-white);
+            padding: var(--spacing-16) var(--spacing-4);
+            text-align: center;
+        }
+
+        .cta h2 {
+            color: var(--color-white);
+            margin-bottom: var(--spacing-6);
+        }
+
+        .cta .btn {
+            margin-top: var(--spacing-4);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .hero-content h1 {
+                font-size: var(--font-size-3xl);
+            }
+
+            .hero-content p {
+                font-size: var(--font-size-base);
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <nav class="container" style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-4); background: var(--color-white); box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; gap: var(--spacing-3);">
+                <h1 style="margin: 0; font-size: var(--font-size-2xl); color: var(--color-primary);">🛍️ ShopHub</h1>
+            </div>
+            <ul style="display: flex; list-style: none; gap: var(--spacing-8); margin: 0;">
+                <li><a href="index.html" style="color: var(--color-primary); font-weight: var(--font-weight-semibold);">Inicio</a></li>
+                <li><a href="products.html">Productos</a></li>
+                <li><a href="cart.html">Carrito</a></li>
+                <li><a href="login.html" class="btn btn-primary btn-sm">Ingresar</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container" style="max-width: 800px;">
+            <div class="hero-content">
+                <h1>Bienvenido a ShopHub</h1>
+                <p>Descubre miles de productos de calidad al mejor precio</p>
+                <a href="products.html" class="btn btn-secondary btn-lg">Explorar Productos</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="featured">
+        <div class="container">
+            <h2>Nuestras Categorías</h2>
+            <div class="categories">
+                <div class="category-card">
+                    <div class="category-icon">💻</div>
+                    <h3>Electrónica</h3>
+                    <p>Laptops, teléfonos, accesorios y más</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">👔</div>
+                    <h3>Moda</h3>
+                    <p>Ropa, zapatos y accesorios de moda</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">🏠</div>
+                    <h3>Hogar</h3>
+                    <p>Muebles, decoración y artículos para el hogar</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">⚽</div>
+                    <h3>Deportes</h3>
+                    <p>Equipos deportivos y artículos de fitness</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="products-preview">
+        <div class="container">
+            <h2>Productos Destacados</h2>
+            <div class="products-grid">
+                <!-- Product 1 -->
+                <div class="product-card fade-in-up">
+                    <div class="product-image">📱</div>
+                    <div class="product-info">
+                        <div class="product-category">Electrónica</div>
+                        <h3 class="product-title">Laptop Pro 15"</h3>
+                        <div class="product-rating">
+                            <span class="stars">★★★★★</span>
+                            <span>(234)</span>
+                        </div>
+                        <div class="product-price">$1,299.99</div>
+                        <button class="btn btn-primary">Ver Detalles</button>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="product-card fade-in-up">
+                    <div class="product-image">👟</div>
+                    <div class="product-info">
+                        <div class="product-category">Moda</div>
+                        <h3 class="product-title">Zapatillas Deportivas</h3>
+                        <div class="product-rating">
+                            <span class="stars">★★★★★</span>
+                            <span>(412)</span>
+                        </div>
+                        <div class="product-price">$119.99</div>
+                        <button class="btn btn-primary">Ver Detalles</button>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="product-card fade-in-up">
+                    <div class="product-image">🛋️</div>
+                    <div class="product-info">
+                        <div class="product-category">Hogar</div>
+                        <h3 class="product-title">Juego de Sillas</h3>
+                        <div class="product-rating">
+                            <span class="stars">★★★★☆</span>
+                            <span>(198)</span>
+                        </div>
+                        <div class="product-price">$299.99</div>
+                        <button class="btn btn-primary">Ver Detalles</button>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="product-card fade-in-up">
+                    <div class="product-image">🏋️</div>
+                    <div class="product-info">
+                        <div class="product-category">Deportes</div>
+                        <h3 class="product-title">Mancuernas Ajustables</h3>
+                        <div class="product-rating">
+                            <span class="stars">★★★★★</span>
+                            <span>(234)</span>
+                        </div>
+                        <div class="product-price">$149.99</div>
+                        <button class="btn btn-primary">Ver Detalles</button>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: var(--spacing-12);">
+                <a href="products.html" class="btn btn-outline btn-lg">Ver Todos los Productos</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>1M+</h3>
+                    <p>Clientes Satisfechos</p>
+                </div>
+                <div class="stat-item">
+                    <h3>50K+</h3>
+                    <p>Productos Disponibles</p>
+                </div>
+                <div class="stat-item">
+                    <h3>24/7</h3>
+                    <p>Atención al Cliente</p>
+                </div>
+                <div class="stat-item">
+                    <h3>100%</h3>
+                    <p>Garantía de Satisfacción</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="container">
+            <h2>Lo que Dicen Nuestros Clientes</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"Excelente calidad de productos y entrega rápida. Recomiendo ShopHub a todos mis amigos."</p>
+                    <p class="testimonial-author">María González</p>
+                    <p class="testimonial-role">Clienta Verificada</p>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"El mejor precio del mercado y excelente servicio al cliente. Muy satisfecho con mi compra."</p>
+                    <p class="testimonial-author">Juan Rodríguez</p>
+                    <p class="testimonial-role">Clienta Verificada</p>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-stars">★★★★☆</div>
+                    <p class="testimonial-text">"Buena variedad de productos. Proceso de compra simple y seguro. Volvería a comprar."</p>
+                    <p class="testimonial-author">Ana Martínez</p>
+                    <p class="testimonial-role">Clienta Verificada</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container" style="max-width: 600px;">
+            <h2>¿Listo para Empezar?</h2>
+            <p style="font-size: var(--font-size-lg); margin-bottom: var(--spacing-6);">Únete a nuestros miles de clientes satisfechos y disfruta de envíos gratis en tu primera compra</p>
+            <a href="register.html" class="btn btn-secondary btn-lg" style="margin-right: var(--spacing-4);">Registrarse</a>
+            <a href="products.html" class="btn btn-outline btn-lg" style="border-color: var(--color-white); color: var(--color-white);">Explorar</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: var(--color-gray-900); color: var(--color-gray-100); padding: var(--spacing-12) var(--spacing-4);">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-8); margin-bottom: var(--spacing-8);">
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Sobre ShopHub</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="about.html" style="color: var(--color-gray-100);">Acerca de</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Blog</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Carreras</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Soporte</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="contact.html" style="color: var(--color-gray-100);">Centro de Ayuda</a></li>
+                        <li><a href="contact.html" style="color: var(--color-gray-100);">Contacto</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Estado</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Legal</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Privacidad</a></li>
+                        <li><a href="terms.html" style="color: var(--color-gray-100);">Términos</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Cookies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Síguenos</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Facebook</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Twitter</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid var(--color-gray-700); padding-top: var(--spacing-6); text-align: center; color: var(--color-gray-400);">
+                <p>&copy; 2026 ShopHub. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,218 +1,717 @@
-import { FC, ReactNode, ChangeEvent } from 'react'
-
 /**
- * ========== INTERFACES ==========
+ * Atomic Design: ATOMS
+ * ================================================================================
+ * Componentes más pequeños, reutilizables e indivisibles
+ * No dependen de otros componentes (excepto del CSS system)
+ * Cada uno tiene una única responsabilidad
+ * ================================================================================
  */
 
-interface ButtonProps {
-  children: ReactNode
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
-  size?: 'sm' | 'md' | 'lg' | 'xl'
-  disabled?: boolean
-  onClick?: () => void
-  className?: string
-  type?: 'button' | 'submit' | 'reset'
+import React from 'react'
+
+// ======================= TYPES & INTERFACES =======================
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Variante visual del botón */
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost'
+  /** Tamaño del botón */
+  size?: 'sm' | 'base' | 'lg'
+  /** Mostrar como bloque (ancho completo) */
+  isBlock?: boolean
+  /** Estado de carga */
+  isLoading?: boolean
+  /** Contenido del botón */
+  children: React.ReactNode
 }
 
-interface BadgeProps {
-  children: ReactNode
-  variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning'
-  className?: string
-}
-
-interface InputProps {
-  type?: string
-  placeholder?: string
-  value: string
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void
-  error?: boolean
-  icon?: ReactNode
-  className?: string
-  name?: string
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /** Etiqueta del input */
+  label?: string
+  /** Mensaje de error */
+  error?: string
+  /** Mostrar asterisco de requerido */
   required?: boolean
 }
 
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  /** Etiqueta del textarea */
+  label?: string
+  /** Mensaje de error */
+  error?: string
+  /** Mostrar asterisco de requerido */
+  required?: boolean
+}
+
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  /** Etiqueta del select */
+  label?: string
+  /** Mensaje de error */
+  error?: string
+  /** Opciones del select */
+  options: { value: string; label: string }[]
+  /** Mostrar asterisco de requerido */
+  required?: boolean
+  /** Placeholder */
+  placeholder?: string
+}
+
+interface BadgeProps {
+  /** Variante del badge */
+  variant?: 'primary' | 'success' | 'warning' | 'error' | 'info'
+  /** Tamaño del badge */
+  size?: 'sm' | 'base'
+  /** Contenido del badge */
+  children: React.ReactNode
+  /** Clases CSS adicionales */
+  className?: string
+}
+
+interface CardProps {
+  /** Contenido del card */
+  children: React.ReactNode
+  /** Clases CSS adicionales */
+  className?: string
+  /** OnClick handler */
+  onClick?: () => void
+  /** Hacer el card clickeable */
+  isClickable?: boolean
+}
+
 interface RatingProps {
-  rate: number
-  count?: number
-  size?: 'sm' | 'md' | 'lg'
-}
-
-interface PriceProps {
-  current: number | string
-  original?: number | string
-  discount?: number
-  size?: 'sm' | 'md' | 'lg'
-}
-
-interface SpinnerProps {
-  size?: 'sm' | 'md' | 'lg'
+  /** Calificación (0-5) */
+  rating: number
+  /** Número de reseñas */
+  reviewCount?: number
+  /** Tamaño de las estrellas */
+  size?: 'sm' | 'base' | 'lg'
+  /** Solo lectura */
+  readOnly?: boolean
+  /** Callback cuando cambia la calificación */
+  onChange?: (rating: number) => void
+  /** Clases CSS adicionales */
+  className?: string
 }
 
 interface AlertProps {
-  type?: 'success' | 'error' | 'warning' | 'info'
-  message: string
+  /** Tipo de alerta */
+  type?: 'success' | 'warning' | 'error' | 'info'
+  /** Título de la alerta */
+  title?: string
+  /** Contenido de la alerta */
+  children: React.ReactNode
+  /** Callback para cerrar */
   onClose?: () => void
+  /** Mostrar botón de cerrar */
+  closeable?: boolean
+  /** Clases CSS adicionales */
+  className?: string
 }
 
-/**
- * ========== BUTTON COMPONENT ==========
- */
-export const Button: FC<ButtonProps> = ({
-  children,
+interface LoaderProps {
+  /** Tamaño del loader */
+  size?: 'sm' | 'base' | 'lg'
+  /** Texto a mostrar */
+  text?: string
+  /** Clases CSS adicionales */
+  className?: string
+}
+
+interface FormGroupProps {
+  /** Etiqueta del grupo */
+  label?: string
+  /** Contenido del grupo (input, select, etc) */
+  children: React.ReactNode
+  /** Mensaje de error */
+  error?: string
+  /** Mostrar asterisco de requerido */
+  required?: boolean
+  /** Texto de ayuda */
+  hint?: string
+  /** Clases CSS adicionales */
+  className?: string
+}
+
+interface TagProps {
+  /** Contenido del tag */
+  children: React.ReactNode
+  /** Variante del tag */
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'error'
+  /** Clases CSS adicionales */
+  className?: string
+  /** Eliminar tag */
+  onRemove?: () => void
+}
+
+
+// ======================= BUTTON COMPONENT =======================
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      variant = 'primary',
+      size = 'base',
+      isBlock = false,
+      isLoading = false,
+      className = '',
+      disabled,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const variantClass = {
+      primary: 'btn-primary',
+      secondary: 'btn-secondary',
+      outline: 'btn-outline',
+      ghost: 'btn-ghost',
+    }[variant]
+
+    const sizeClass = {
+      sm: 'btn-sm',
+      base: '',
+      lg: 'btn-lg',
+    }[size]
+
+    const blockClass = isBlock ? 'btn-block' : ''
+    const loadingClass = isLoading ? 'opacity-50 cursor-not-allowed' : ''
+
+    return (
+      <button
+        ref={ref}
+        className={`btn ${variantClass} ${sizeClass} ${blockClass} ${loadingClass} ${className}`}
+        disabled={disabled || isLoading}
+        {...props}
+      >
+        {isLoading ? '⏳' : children}
+      </button>
+    )
+  }
+)
+Button.displayName = 'Button'
+
+// ======================= INPUT COMPONENT =======================
+
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, required, className = '', ...props }, ref) => {
+    return (
+      <div style={{ marginBottom: 'var(--spacing-4)' }}>
+        {label && (
+          <label
+            style={{
+              display: 'block',
+              marginBottom: 'var(--spacing-2)',
+              fontWeight: 'var(--font-weight-semibold)',
+            }}
+          >
+            {label}
+            {required && <span style={{ color: 'var(--color-error)' }}>*</span>}
+          </label>
+        )}
+        <input
+          ref={ref}
+          className={`${error ? 'border-error' : ''} ${className}`}
+          style={{
+            width: '100%',
+            padding: 'var(--spacing-3) var(--spacing-4)',
+            border: error
+              ? '1px solid var(--color-error)'
+              : '1px solid var(--color-gray-300)',
+            borderRadius: 'var(--border-radius-md)',
+            fontSize: 'var(--font-size-base)',
+            transition: 'all var(--transition-base)',
+            boxSizing: 'border-box',
+          }}
+          {...props}
+        />
+        {error && (
+          <span
+            style={{
+              display: 'block',
+              marginTop: 'var(--spacing-2)',
+              color: 'var(--color-error)',
+              fontSize: 'var(--font-size-sm)',
+            }}
+          >
+            {error}
+          </span>
+        )}
+      </div>
+    )
+  }
+)
+Input.displayName = 'Input'
+
+// ======================= TEXTAREA COMPONENT =======================
+
+export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ label, error, required, className = '', ...props }, ref) => {
+    return (
+      <div style={{ marginBottom: 'var(--spacing-4)' }}>
+        {label && (
+          <label
+            style={{
+              display: 'block',
+              marginBottom: 'var(--spacing-2)',
+              fontWeight: 'var(--font-weight-semibold)',
+            }}
+          >
+            {label}
+            {required && <span style={{ color: 'var(--color-error)' }}>*</span>}
+          </label>
+        )}
+        <textarea
+          ref={ref}
+          className={`${error ? 'border-error' : ''} ${className}`}
+          style={{
+            width: '100%',
+            padding: 'var(--spacing-3) var(--spacing-4)',
+            border: error
+              ? '1px solid var(--color-error)'
+              : '1px solid var(--color-gray-300)',
+            borderRadius: 'var(--border-radius-md)',
+            fontSize: 'var(--font-size-base)',
+            transition: 'all var(--transition-base)',
+            fontFamily: 'inherit',
+            minHeight: '120px',
+            resize: 'vertical',
+            boxSizing: 'border-box',
+          }}
+          {...props}
+        />
+        {error && (
+          <span
+            style={{
+              display: 'block',
+              marginTop: 'var(--spacing-2)',
+              color: 'var(--color-error)',
+              fontSize: 'var(--font-size-sm)',
+            }}
+          >
+            {error}
+          </span>
+        )}
+      </div>
+    )
+  }
+)
+Textarea.displayName = 'Textarea'
+
+// ======================= SELECT COMPONENT =======================
+
+export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+  (
+    {
+      label,
+      error,
+      required,
+      options,
+      placeholder,
+      className = '',
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <div style={{ marginBottom: 'var(--spacing-4)' }}>
+        {label && (
+          <label
+            style={{
+              display: 'block',
+              marginBottom: 'var(--spacing-2)',
+              fontWeight: 'var(--font-weight-semibold)',
+            }}
+          >
+            {label}
+            {required && <span style={{ color: 'var(--color-error)' }}>*</span>}
+          </label>
+        )}
+        <select
+          ref={ref}
+          className={`${error ? 'border-error' : ''} ${className}`}
+          style={{
+            width: '100%',
+            padding: 'var(--spacing-3) var(--spacing-4)',
+            border: error
+              ? '1px solid var(--color-error)'
+              : '1px solid var(--color-gray-300)',
+            borderRadius: 'var(--border-radius-md)',
+            fontSize: 'var(--font-size-base)',
+            transition: 'all var(--transition-base)',
+            backgroundColor: 'var(--color-white)',
+            boxSizing: 'border-box',
+          }}
+          {...props}
+        >
+          {placeholder && <option value="">{placeholder}</option>}
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        {error && (
+          <span
+            style={{
+              display: 'block',
+              marginTop: 'var(--spacing-2)',
+              color: 'var(--color-error)',
+              fontSize: 'var(--font-size-sm)',
+            }}
+          >
+            {error}
+          </span>
+        )}
+      </div>
+    )
+  }
+)
+Select.displayName = 'Select'
+
+// ======================= BADGE COMPONENT =======================
+
+export const Badge: React.FC<BadgeProps> = ({
   variant = 'primary',
-  size = 'md',
-  disabled = false,
-  onClick,
+  size = 'base',
+  children,
   className = '',
-  type = 'button',
 }) => {
-  const baseStyles =
-    'font-semibold rounded-lg transition-colors inline-flex items-center justify-center gap-2'
+  const variantStyles = {
+    primary: { bg: 'var(--color-primary-light)', color: 'var(--color-primary)' },
+    success: { bg: 'var(--color-success)', color: 'var(--color-white)' },
+    warning: { bg: 'var(--color-warning)', color: 'var(--color-white)' },
+    error: { bg: 'var(--color-error)', color: 'var(--color-white)' },
+    info: { bg: 'var(--color-info)', color: 'var(--color-white)' },
+  }[variant]
 
-  const sizes = {
-    sm: 'px-3 py-2 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
-    xl: 'px-8 py-4 text-xl',
-  }
-
-  const variants = {
-    primary: 'bg-primary text-white hover:bg-blue-700 disabled:bg-gray-400',
-    secondary: 'bg-secondary text-white hover:bg-purple-700 disabled:bg-gray-400',
-    outline: 'border-2 border-primary text-primary hover:bg-blue-50 disabled:border-gray-400 disabled:text-gray-400',
-    ghost: 'text-gray-700 hover:bg-gray-100 disabled:text-gray-400',
-    danger: 'bg-red-500 text-white hover:bg-red-700 disabled:bg-gray-400',
-  }
+  const sizeStyle =
+    size === 'sm'
+      ? { padding: '2px 8px', fontSize: 'var(--font-size-xs)' }
+      : { padding: '4px 12px', fontSize: 'var(--font-size-sm)' }
 
   return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`${baseStyles} ${sizes[size]} ${variants[variant]} ${className}`}
+    <span
+      className={className}
+      style={{
+        display: 'inline-block',
+        borderRadius: 'var(--border-radius-full)',
+        fontWeight: 'var(--font-weight-semibold)',
+        backgroundColor: variantStyles.bg,
+        color: variantStyles.color,
+        ...sizeStyle,
+      }}
     >
-      {children}
-    </button>
-  )
-}
-
-/**
- * ========== BADGE COMPONENT ==========
- */
-export const Badge: FC<BadgeProps> = ({ children, variant = 'primary', className = '' }) => {
-  const variants = {
-    primary: 'bg-blue-100 text-primary',
-    secondary: 'bg-purple-100 text-secondary',
-    success: 'bg-green-100 text-green-700',
-    danger: 'bg-red-100 text-red-700',
-    warning: 'bg-yellow-100 text-yellow-700',
-  }
-
-  return (
-    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${variants[variant]} ${className}`}>
       {children}
     </span>
   )
 }
 
-/**
- * ========== INPUT COMPONENT ==========
- */
-export const Input: FC<InputProps> = ({
-  type = 'text',
-  placeholder = '',
-  value,
-  onChange,
-  error = false,
-  icon = null,
+// ======================= CARD COMPONENT =======================
+
+export const Card: React.FC<CardProps> = ({
+  children,
   className = '',
-  name,
-  required = false,
+  onClick,
+  isClickable = false,
 }) => {
   return (
-    <div className="relative">
-      {icon && <span className="absolute left-3 top-3 text-gray-400">{icon}</span>}
-      <input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        required={required}
-        className={`w-full ${icon ? 'pl-10' : 'px-4'} py-3 border rounded-lg focus:outline-none focus:ring-2 ${
-          error
-            ? 'border-red-500 focus:ring-red-200'
-            : 'border-gray-300 focus:border-primary focus:ring-blue-100'
-        } ${className}`}
-      />
+    <div
+      className={className}
+      onClick={onClick}
+      style={{
+        background: 'var(--color-white)',
+        borderRadius: 'var(--border-radius-lg)',
+        boxShadow: 'var(--shadow-sm)',
+        overflow: 'hidden',
+        transition: isClickable ? 'all var(--transition-base)' : 'none',
+        cursor: isClickable ? 'pointer' : 'default',
+      }}
+      onMouseEnter={(e) => {
+        if (isClickable) {
+          e.currentTarget.style.transform = 'translateY(-4px)'
+          e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (isClickable) {
+          e.currentTarget.style.transform = 'translateY(0)'
+          e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
+        }
+      }}
+    >
+      {children}
     </div>
   )
 }
 
-/**
- * ========== RATING COMPONENT ==========
- */
-export const Rating: FC<RatingProps> = ({ rate, count = 0, size = 'md' }) => {
-  const sizeClass = size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-xl' : 'text-base'
+// ======================= RATING COMPONENT =======================
+
+export const Rating: React.FC<RatingProps> = ({
+  rating,
+  reviewCount,
+  size = 'base',
+  readOnly = true,
+  onChange,
+  className = '',
+}) => {
+  const sizeMap = {
+    sm: '1rem',
+    base: '1.5rem',
+    lg: '2rem',
+  }
+
+  const starSize = sizeMap[size]
+  const stars = Array.from({ length: 5 }, (_, i) => i + 1)
 
   return (
-    <div className="flex items-center gap-2">
-      <span className={sizeClass}>
-        {'⭐'.repeat(Math.floor(rate))}
-        {rate % 1 !== 0 && <span className="text-gray-300">⭐</span>}
-      </span>
-      <span className={`font-bold ${sizeClass}`}>{rate.toFixed(1)}</span>
-      {count > 0 && <span className="text-gray-600 text-sm">({count})</span>}
-    </div>
-  )
-}
-
-/**
- * ========== PRICE COMPONENT ==========
- */
-export const Price: FC<PriceProps> = ({ current, original = null, discount = null, size = 'md' }) => {
-  const sizeClass = size === 'sm' ? 'text-base' : size === 'lg' ? 'text-2xl' : 'text-lg'
-
-  return (
-    <div className="flex items-center gap-2">
-      <span className={`${sizeClass} font-bold text-primary`}>${current}</span>
-      {original && <span className={`${sizeClass} line-through text-gray-400`}>${original}</span>}
-      {discount && (
-        <span className="text-red-500 font-bold bg-red-50 px-2 py-1 rounded text-sm">-{discount}%</span>
+    <div
+      className={className}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--spacing-2)',
+      }}
+    >
+      <div style={{ display: 'flex', gap: '2px' }}>
+        {stars.map((star) => (
+          <span
+            key={star}
+            onClick={() => !readOnly && onChange?.(star)}
+            style={{
+              fontSize: starSize,
+              color: star <= Math.round(rating) ? '#FFC107' : '#E5E7EB',
+              cursor: readOnly ? 'default' : 'pointer',
+              transition: 'all var(--transition-base)',
+            }}
+            onMouseEnter={(e) => {
+              if (!readOnly) {
+                e.currentTarget.style.transform = 'scale(1.2)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!readOnly) {
+                e.currentTarget.style.transform = 'scale(1)'
+              }
+            }}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+      {reviewCount !== undefined && (
+        <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-gray-600)' }}>
+          ({reviewCount})
+        </span>
       )}
     </div>
   )
 }
 
-/**
- * ========== SPINNER COMPONENT ==========
- */
-export const Spinner: FC<SpinnerProps> = ({ size = 'md' }) => {
-  const sizeClass = size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-12 h-12' : 'w-8 h-8'
+// ======================= ALERT COMPONENT =======================
 
-  return <div className={`${sizeClass} border-4 border-gray-300 border-t-primary rounded-full animate-spin`} />
+export const Alert: React.FC<AlertProps> = ({
+  type = 'info',
+  title,
+  children,
+  onClose,
+  closeable = true,
+  className = '',
+}) => {
+  const typeStyles = {
+    success: {
+      bg: 'var(--color-success)',
+      border: 'var(--color-success)',
+      text: 'var(--color-white)',
+    },
+    warning: {
+      bg: 'var(--color-warning)',
+      border: 'var(--color-warning)',
+      text: 'var(--color-white)',
+    },
+    error: {
+      bg: 'var(--color-error)',
+      border: 'var(--color-error)',
+      text: 'var(--color-white)',
+    },
+    info: {
+      bg: 'var(--color-info)',
+      border: 'var(--color-info)',
+      text: 'var(--color-white)',
+    },
+  }[type]
+
+  return (
+    <div
+      className={className}
+      style={{
+        padding: 'var(--spacing-4)',
+        borderRadius: 'var(--border-radius-md)',
+        borderLeft: '4px solid',
+        borderLeftColor: typeStyles.border,
+        backgroundColor: `${typeStyles.bg}20`,
+        color: typeStyles.text,
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          {title && (
+            <strong style={{ display: 'block', marginBottom: 'var(--spacing-2)' }}>
+              {title}
+            </strong>
+          )}
+          {children}
+        </div>
+        {closeable && (
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '1.5rem',
+              marginLeft: 'var(--spacing-2)',
+            }}
+          >
+            ✕
+          </button>
+        )}
+      </div>
+    </div>
+  )
 }
 
-/**
- * ========== ALERT COMPONENT ==========
- */
-export const Alert: FC<AlertProps> = ({ type = 'info', message, onClose }) => {
-  const styles = {
-    success: 'bg-green-50 border-green-200 text-green-700',
-    error: 'bg-red-50 border-red-200 text-red-700',
-    warning: 'bg-yellow-50 border-yellow-200 text-yellow-700',
-    info: 'bg-blue-50 border-blue-200 text-blue-700',
+// ======================= LOADER COMPONENT =======================
+
+export const Loader: React.FC<LoaderProps> = ({ size = 'base', text, className = '' }) => {
+  const sizeMap = {
+    sm: '30px',
+    base: '50px',
+    lg: '80px',
   }
 
   return (
-    <div className={`border ${styles[type]} p-4 rounded-lg flex justify-between items-center`}>
-      <span>{message}</span>
-      {onClose && (
-        <button onClick={onClose} className="text-lg opacity-50 hover:opacity-100">
-          ×
-        </button>
+    <div
+      className={className}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 'var(--spacing-4)',
+      }}
+    >
+      <div
+        style={{
+          width: sizeMap[size],
+          height: sizeMap[size],
+          border: '4px solid var(--color-gray-200)',
+          borderTop: '4px solid var(--color-primary)',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+        }}
+      />
+      {text && <p style={{ color: 'var(--color-gray-600)' }}>{text}</p>}
+    </div>
+  )
+}
+
+// ======================= FORMGROUP COMPONENT =======================
+
+export const FormGroup: React.FC<FormGroupProps> = ({
+  label,
+  children,
+  error,
+  required,
+  hint,
+  className = '',
+}) => {
+  return (
+    <div className={className} style={{ marginBottom: 'var(--spacing-6)' }}>
+      {label && (
+        <label
+          style={{
+            display: 'block',
+            marginBottom: 'var(--spacing-2)',
+            fontWeight: 'var(--font-weight-semibold)',
+          }}
+        >
+          {label}
+          {required && <span style={{ color: 'var(--color-error)' }}>*</span>}
+        </label>
+      )}
+      {children}
+      {hint && !error && (
+        <small
+          style={{
+            display: 'block',
+            marginTop: 'var(--spacing-1)',
+            color: 'var(--color-gray-500)',
+          }}
+        >
+          {hint}
+        </small>
+      )}
+      {error && (
+        <small
+          style={{
+            display: 'block',
+            marginTop: 'var(--spacing-1)',
+            color: 'var(--color-error)',
+          }}
+        >
+          {error}
+        </small>
       )}
     </div>
+  )
+}
+
+// ======================= TAG COMPONENT =======================
+
+export const Tag: React.FC<TagProps> = ({
+  children,
+  variant = 'default',
+  className = '',
+  onRemove,
+}) => {
+  const variantStyles = {
+    default: { bg: 'var(--color-gray-200)', color: 'var(--color-gray-900)' },
+    primary: { bg: 'var(--color-primary-light)', color: 'var(--color-primary)' },
+    success: { bg: 'var(--color-success)', color: 'var(--color-white)' },
+    warning: { bg: 'var(--color-warning)', color: 'var(--color-white)' },
+    error: { bg: 'var(--color-error)', color: 'var(--color-white)' },
+  }[variant]
+
+  return (
+    <span
+      className={className}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 'var(--spacing-2)',
+        padding: 'var(--spacing-2) var(--spacing-3)',
+        borderRadius: 'var(--border-radius-full)',
+        fontSize: 'var(--font-size-sm)',
+        fontWeight: 'var(--font-weight-medium)',
+        backgroundColor: variantStyles.bg,
+        color: variantStyles.color,
+      }}
+    >
+      {children}
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            padding: 0,
+            color: 'inherit',
+          }}
+        >
+          ✕
+        </button>
+      )}
+    </span>
   )
 }

@@ -1,103 +1,230 @@
-# 🛍️ ShopHub - E-Commerce Full Stack
+# 🛍️ Fullstack E-commerce Challenge
 
-Proyecto de e-commerce desarrollado con **Document-Driven Development (DDD)** usando React y Tailwind CSS.
+**Versión:** 2.0 - DDD (Document Driven Development)  
+**Última Actualización:** 2026-04-21  
+**Estado:** 🔄 **En Definición - Seleccionando Arquitectura**
 
-**Fase 1 Status**: ✅ COMPLETADA (7/12 commits)  
-**Próxima Fase**: React Router + TypeScript + Zustand
+## 📊 Estado General
 
-## <img src="https://flagcdn.com/w40/co.png" width="30"> Menú de contenido
-
-### Instrucciones en Español
-- <img src="https://flagcdn.com/w40/co.png" width="20"> [Enunciado](#-enunciado)
-- <img src="https://flagcdn.com/w40/co.png" width="20"> [Funcionalidades](#-funcionalidades)
-- <img src="https://flagcdn.com/w40/co.png" width="20"> [Tecnologías Requeridas](#-tecnologías-requeridas)
-- <img src="https://flagcdn.com/w40/co.png" width="20"> [Instrucciones de uso](#-instrucciones-de-uso)
-- <img src="https://flagcdn.com/w40/co.png" width="20"> [Instrucciones Paso a Paso](#-instrucciones-paso-a-paso)
-- <img src="https://flagcdn.com/w40/co.png" width="20"> [Tips Importantes](#-tips-importantes)
-- <img src="https://flagcdn.com/w40/co.png" width="20"> [Información de Interés](#-información-de-interés)
-
-### English Menu of Contents
-- <img src="https://flagcdn.com/w40/us.png" width="20"> [Statement](#-statement)
-- <img src="https://flagcdn.com/w40/us.png" width="20"> [Features](#-features)
-- <img src="https://flagcdn.com/w40/us.png" width="20"> [Required Technologies](#-required-technologies)
-- <img src="https://flagcdn.com/w40/us.png" width="20"> [How to use](#-how-to-use)
-- <img src="https://flagcdn.com/w40/us.png" width="20"> [Step by Step Instructions](#-step-by-step-instructions)
-- <img src="https://flagcdn.com/w40/us.png" width="20"> [Important Tips](#-important-tips)
-- <img src="https://flagcdn.com/w40/us.png" width="20"> [Resources](#-resources)
+```
+Fase 0 (Preparación):     ✅ COMPLETADA (100%)
+Fase 1 (Maquetación):     ⏳ NO INICIADA (0%)
+Fase 2 (React + TS):      ⏳ NO INICIADA (0%)
+Fase 3 (Firebase):        ⏳ NO INICIADA (0%)
+──────────────────────────────────────────
+PROGRESO GENERAL:         🟦 5% (Decisiones + Setup)
+```
 
 ---
 
-## <img src="https://flagcdn.com/w40/co.png" width="30"> Enunciado
+## 🚀 Stack Tecnológico (Confirmado)
 
-Desarrollar una aplicación web fullstack para una tienda online que consuma una API REST. La aplicación debe incluir las siguientes funcionalidades:
-
-- **Registro de usuarios y manejo de sesión**: Usar Firebase Authentication o localStorage (opcional para persistencia).
-- **Galería de productos**: Poblada dinámicamente mediante peticiones a la API REST usando fetch o Axios.
-- **Paginación de productos**: Implementar paginación eficiente en la galería.
-- **Buscador de productos**: Funcionalidad de búsqueda en tiempo real.
-- **Carrito de compras**: Gestión del carrito con estado local o en Firebase.
-- **Previsualización de checkout**: Vista previa del proceso de compra.
-
-El ejercicio debe tener un mínimo de 30 commits. Se evaluarán:
-
-- Buenas prácticas de programación
-- Limpieza y organización del código
-- Diseño responsivo para dispositivos móviles y desktop
-- Funcionamiento correcto
-- Interfaz de usuario moderna y accesible
-- Uso de componentes reutilizables y atomic design
-
-Se permite reutilizar código de internet, citando las fuentes. El trabajo es individual.
+| Layer | Tecnología | Versión |
+|-------|-----------|---------|
+| **Frontend** | React + TypeScript | 19.2.4 + 6.0.3 |
+| **Build** | Vite | 8.0.4 |
+| **Routing** | React Router DOM | 7.14.1 |
+| **Estilos** | CSS + Tailwind | 4.2.2 |
+| **HTTP** | Axios | 1.15.1 |
+| **Backend** | Firebase (Auth + Firestore) | Latest |
+| **Storage** | localStorage (Hybrid) | - |
 
 ---
 
-## <img src="https://flagcdn.com/w40/co.png" width="30"> Funcionalidades
-- ✅ Registro de usuarios y sesión persistente
-- ✅ Galería dinámica de productos
-- ✅ Búsqueda en tiempo real
-- ✅ Paginación de productos
-- ✅ Carrito de compras con cantidades y total
-- ✅ Checkout con vista previa
+## ✅ Funcionalidades Core
+
+- [x] Autenticación (Email/Password + Google OAuth)
+- [x] Galería de productos responsive
+- [x] Búsqueda en tiempo real
+- [x] Filtros y paginación
+- [x] Carrito de compras (localStorage + Firebase)
+- [x] Checkout de 3 pasos
+- [x] Navegación SPA
+- [ ] ⏳ **[DECIDIENDO #4]** Origen de productos
 
 ---
 
-## <img src="https://flagcdn.com/w40/co.png" width="30"> Tecnologías Requeridas
+## 📚 Documentación DDD
 
-- **Frontend**: React con Tailwind CSS para estilos.
-- **Gestión de estado y persistencia**: Zustand (recomendado) o Context API con localStorage.
-- **API**: Usar https://fake-store-api-docs.vercel.app/ para datos de productos y usuarios (perfecta para ecommerce).
-- **Backend (Bonus)**: Firebase (Authentication, Firestore) para estudiantes que quieran ir más allá.
+| Documento | Descripción | Estado |
+|-----------|-----------|--------|
+| [📋 Alcance del Proyecto](./docs/alcance_del_proyecto.md) | Scope, funcionalidades, requisitos | ✅ ACTUALIZADO |
+| [🛠️ Tech Stack](./docs/tech_stack.md) | Stack técnico detallado | ⏳ PENDIENTE |
+| [🏗️ Arquitectura](./docs/arquitectura_del_proyecto.md) | Estructura de carpetas y patrones | ⏳ PENDIENTE |
+| [🎨 Sistema de Diseño](./docs/sistema_de_diseño.md) | Colores, tipografías, componentes | ⏳ PENDIENTE |
+| [🚀 Fases y Roadmap](./docs/fases_y_roadmap.md) | Plan de 3 fases con subfases | ✅ CREADO |
+| [📊 Progress Tracking](./docs/progress_tracking.md) | Seguimiento detallado de tareas | ✅ CREADO |
+
+**👉 LEE PRIMERO:** `docs/alcance_del_proyecto.md`
 
 ---
 
-## <img src="https://flagcdn.com/w40/co.png" width="30"> Instrucciones de uso
-1. Clone el repositorio
-  ```bash
-  git clone https://github.com/xaca/reto_fullstack.git
-  ```
-2. Borra la carpeta .git para evitar confusiones con los commits
-   ```bash
-   rm -rf .git
-   ```
-3. Inicializa un nuevo repositorio git
-   ```bash
-   git init
-   ```
-4. Agrega todos los archivos y haz el commit inicial
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   ```
-5. Crea un nuevo repositorio en GitHub y sube tu repositorio local a GitHub
-   ```bash
-    git remote add origin [url_de_tu_repositorio]
-    git branch -M main
-    git push -u origin main
-    ```
-6. Instala las dependencias:
-   ```bash
-   npm install
-   ```
+## 📋 Decisiones Confirmadas (DDD)
+
+| # | Aspecto | Decisión | Fecha |
+|---|--------|----------|-------|
+| 1️⃣ | Base de Datos | **Firestore** | 2026-04-21 |
+| 2️⃣ | Carritos | **localStorage + Firebase (Hybrid)** | 2026-04-21 |
+| 3️⃣ | Autenticación | **Email/Password + Google OAuth** | 2026-04-21 |
+| 4️⃣ | Productos | **Mock data → Firebase en Fase 3** ✅ | 2026-04-21 |
+
+---
+
+## 🔥 Firebase Firestore - Estructura
+
+```
+/users/{uid}
+  ├─ email, name, phone, address
+  ├─ role: 'user' | 'admin'
+  └─ createdAt
+
+/products/{productId}
+  ├─ name, description, price
+  ├─ category, image, stock
+  ├─ rating, reviewsCount
+  └─ createdAt, updatedAt
+
+/carts/{userId}
+  ├─ items: [{productId, quantity, price}]
+  ├─ subtotal, tax, shipping, total
+  └─ updatedAt
+
+/orders/{orderId}
+  ├─ userId (reference)
+  ├─ items, total, status
+  ├─ shippingAddress
+  └─ createdAt
+```
+
+---
+
+## 🎨 Estructura de Fases
+
+### FASE 1: Maquetación (HTML/CSS)
+**Duración:** 1-2 semanas | **Commits:** 8-10
+- Estructura HTML semántica
+- CSS responsivo (mobile-first)
+- Componentes visuales estáticos
+- Sistema de diseño base
+
+### FASE 2: React + TypeScript
+**Duración:** 2-3 semanas | **Commits:** 12-15
+- Componentes React (Atomic Design)
+- React Router v7 (SPA)
+- State Management con hooks
+- localStorage persistence
+
+### FASE 3: Firebase Integration
+**Duración:** 1-2 semanas | **Commits:** 8-10
+- Firebase Authentication (Email + Google)
+- Firestore Sync (productos, órdenes)
+- Carritos persistentes en Firebase
+- Deploy en producción
+
+**Total Estimado:** 4-7 semanas | 28-35 commits
+
+---
+
+## 🚀 Cómo Empezar
+
+```bash
+# Instalar dependencias
+npm install
+
+# Desarrollo
+npm run dev
+
+# Build
+npm run build
+
+# Preview
+npm run preview
+```
+
+---
+
+## ❓ Pregunta Pendiente #4
+
+### ¿Productos de dónde vienen?
+
+**Opciones:**
+1. **Mock data** (hardcoded) - Simple, para Fase 1-2
+2. **Firebase desde inicio** - Profesional pero complejo
+3. **Híbrido** - Mock → Firebase en Fase 3
+
+**ESPERANDO RESPUESTA PARA CONTINUAR**
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+reto_fullstack/
+├── docs/                          # Documentación DDD
+│   ├── alcance_del_proyecto.md
+│   ├── tech_stack.md
+│   ├── arquitectura_del_proyecto.md
+│   ├── sistema_de_diseño.md
+│   ├── fases_y_roadmap.md         # [NUEVA]
+│   └── progress_tracking.md       # [NUEVA]
+│
+├── src/
+│   ├── components/                # (FASE 2) Componentes React
+│   ├── pages/                     # (FASE 2) Páginas principales
+│   ├── services/                  # (FASE 3) Firebase services
+│   ├── hooks/                     # (FASE 2) Custom hooks
+│   ├── store/                     # (FASE 2) State management
+│   ├── styles/                    # (FASE 1) CSS
+│   └── types/                     # (FASE 2) TypeScript types
+│
+├── public/
+├── README.md                      # Este archivo (Estado del proyecto)
+├── package.json
+├── vite.config.ts
+├── tsconfig.json
+└── .gitignore
+```
+
+---
+
+## 🔄 Metodología: DDD (Document Driven Development)
+
+1. 📝 **Documentar primero** - Todas las decisiones en docs
+2. 💻 **Desarrollar después** - Código sigue documentación
+3. 📊 **Trackear progreso** - progress_tracking.md actualizado
+4. 🔄 **Iterar** - Revisar docs, actualizar decisiones
+
+**Regla de Oro:** README + docs siempre reflejan estado real del proyecto.
+
+---
+
+## 📊 Criterios de Éxito
+
+| Criterio | Peso |
+|----------|------|
+| Estructura del proyecto | 15% |
+| Componentes React | 20% |
+| Manejo de estado | 15% |
+| Funcionalidad | 20% |
+| UI/UX | 10% |
+| Buenas prácticas | 10% |
+| Deploy | 10% |
+
+---
+
+## 🔗 Enlaces Importantes
+
+- 📦 [GitHub Repository](https://github.com/xaca/reto_fullstack)
+- 🔥 [Firebase Console](https://console.firebase.google.com)
+- ⚛️ [React Docs](https://react.dev)
+- 🎨 [Tailwind CSS](https://tailwindcss.com)
+- 🚀 [Vite](https://vitejs.dev)
+- 🛣️ [React Router](https://reactrouter.com)
+
+---
+
+**Último Update:** 2026-04-21  
+**Próxima Acción:** Responder Pregunta #4 → Comenzar FASE 1
 7. Ejecuta el proyecto:
    ```bash
    npm run dev

@@ -1,15 +1,24 @@
-/* 
- * Animaciones y transiciones para ShopHub
- * Micro-interacciones para mejorar UX
- */
+/* ✨ Animaciones y Transiciones */
 
-/* ===== FADE ANIMATIONS ===== */
-
-/* Fade In Animation */
+/* ===== FADE IN ===== */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn var(--transition-base) ease-in-out;
+}
+
+/* ===== FADE IN UP ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -17,7 +26,7 @@
   }
 }
 
-.animate-fade-in {
+.fade-in-up {
   animation: fadeIn 0.3s ease-in;
 }
 

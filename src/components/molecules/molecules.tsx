@@ -1,134 +1,581 @@
-import { FC, ReactNode } from 'react'
-import { Price } from '../atoms/atoms'
-import type { CartItem } from '../../types'
+import React, { useState } from 'react'
+import {
+  Button,
+  Input,
+  Rating,
+  Badge,
+  Card,
+  Select,
+  Textarea,
+} from '@components/atoms/atoms'
 
-/**
- * ========== INTERFACES ==========
- */
+// ======================== PRODUCT CARD ========================
 
-interface CartItemCardProps {
-  item: CartItem
-  onQuantityChange: (id: number, quantity: number) => void
-  onRemove: (id: number) => void
-}
-
-interface FormGroupProps {
-  label?: string
-  children: ReactNode
-  error?: string | null
-  required?: boolean
-  helperText?: string
-}
-
-interface CategorySelectorProps {
-  categories: Array<{ id: string; label: string }>
-  selected?: string
-  onChange: (id: string) => void
-}
-
-interface InfoBoxProps {
-  icon: ReactNode
+export interface ProductCardProps {
+  /** Product ID */
+  id: string | number
+  /** Product name/title */
   title: string
-  description: string
-  variant?: 'success' | 'warning' | 'error' | 'info'
-}
-
-interface StatProps {
-  value: string | number
-  label: string
-  icon?: ReactNode
-  trend?: number
+  /** Product image URL */
+  image: string
+  /** Product price */
+  price: number
+  /** Original price before discount */
+  originalPrice?: number
+  /** Product rating (0-5) */
+  rating: number
+  /** Number of reviews */
+  reviewCount: number
+  /** Whether product is in stock */
+  inStock?: boolean
+  /** Discount percentage */
+  discount?: number
+  /** Callback when product card is clicked */
+  onCardClick?: () => void
+  /** Callback when add to cart is clicked */
+  onAddToCart?: () => void
+  /** Additional className */
+  className?: string
 }
 
 /**
- * ========== CART ITEM CARD COMPONENT ==========
+ * ProductCard - Displays a product in grid/list view
+ * Combines: Badge (discount), Rating, Button
  */
-export const CartItemCard: FC<CartItemCardProps> = ({
-  item,
-  onQuantityChange,
-  onRemove,
+export const ProductCard: React.FC<ProductCardProps> = ({
+  id,
+  title,
+  image,
+  price,
+  originalPrice,
+  rating,
+  reviewCount,
+  inStock = true,
+  discount,
+  onCardClick,
+  onAddToCart,
+  className = '',
 }) => {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 flex gap-4 hover:shadow-md transition-shadow">
-      {/* Imagen */}
-      <div className="w-24 h-24 bg-gray-100 rounded flex-shrink-0">
-        <img src={item.image} alt={item.title} className="w-full h-full object-cover rounded" />
+    <Card isClickable onClick={onCardClick} className={className}>
+      <div style={{ position: 'relative', overflow: 'hidden', height: '200px' }}>
+        <img
+          src={image}
+          alt={title}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transition: 'transform var(--transition-base)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.05)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+        />
+        {discount && (
+          <Badge
+            variant="error"
+            size="sm"
+            style={{
+              position: 'absolute',
+              top: 'var(--spacing-3)',
+              right: 'var(--spacing-3)',
+            }}
+          >
+            -{discount}%
+          </Badge>
+        )}
+        {!inStock && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--color-white)',
+              fontWeight: 'var(--font-weight-bold)',
+            }}
+          >
+            Out of Stock
+          </div>
+        )}
       </div>
 
-      {/* Detalles */}
-      <div className="flex-1">
-        <h3 className="font-bold text-lg mb-2">{item.title}</h3>
-        <Price current={item.price} size="sm" />
+      <div style={{ padding: 'var(--spacing-4)' }}>
+        <h3
+          style={{
+            fontSize: 'var(--font-size-base)',
+            fontWeight: 'var(--font-weight-semibold)',
+            marginBottom: 'var(--spacing-2)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {title}
+        </h3>
+
+        <Rating rating={rating} reviewCount={reviewCount} size="sm" />
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--spacing-2)',
+            marginTop: 'var(--spacing-3)',
+            marginBottom: 'var(--spacing-3)',
+          }}
+        >
+          <span style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>
+            ${price.toFixed(2)}
+          </span>
+          {originalPrice && (
+            <span
+              style={{
+                fontSize: 'var(--font-size-sm)',
+                textDecoration: 'line-through',
+                color: 'var(--color-gray-500)',
+              }}
+            >
+              ${originalPrice.toFixed(2)}
+            </span>
+          )}
+        </div>
+
+        <Button
+          variant="primary"
+          size="sm"
+          isBlock
+          disabled={!inStock}
+          onClick={(e) => {
+            e.stopPropagation()
+            onAddToCart?.()
+          }}
+        >
+          {inStock ? 'Add to Cart' : 'Out of Stock'}
+        </Button>
+      </div>
+    </Card>
+  )
+}
+
+// ======================== CART ITEM ========================
+
+export interface CartItemProps {
+  /** Item ID */
+  id: string | number
+  /** Product title */
+  title: string
+  /** Product image URL */
+  image: string
+  /** Unit price */
+  price: number
+  /** Quantity in cart */
+  quantity: number
+  /** Callback when quantity changes */
+  onQuantityChange: (newQuantity: number) => void
+  /** Callback when item is removed */
+  onRemove: () => void
+  /** Additional className */
+  className?: string
+}
+
+/**
+ * CartItem - Single item in shopping cart
+ * Combines: Button (qty controls), Input (qty), Button (remove)
+ */
+export const CartItem: React.FC<CartItemProps> = ({
+  id,
+  title,
+  image,
+  price,
+  quantity,
+  onQuantityChange,
+  onRemove,
+  className = '',
+}) => {
+  return (
+    <div
+      className={className}
+      style={{
+        display: 'flex',
+        gap: 'var(--spacing-4)',
+        padding: 'var(--spacing-4)',
+        borderBottom: '1px solid var(--color-gray-200)',
+        alignItems: 'center',
+      }}
+    >
+      {/* Image */}
+      <img
+        src={image}
+        alt={title}
+        style={{
+          width: '80px',
+          height: '80px',
+          objectFit: 'cover',
+          borderRadius: 'var(--border-radius-md)',
+        }}
+      />
+
+      {/* Details */}
+      <div style={{ flex: 1 }}>
+        <h4
+          style={{
+            fontSize: 'var(--font-size-base)',
+            fontWeight: 'var(--font-weight-semibold)',
+            marginBottom: 'var(--spacing-1)',
+          }}
+        >
+          {title}
+        </h4>
+        <p style={{ color: 'var(--color-gray-600)', fontSize: 'var(--font-size-sm)' }}>
+          ${price.toFixed(2)} each
+        </p>
       </div>
 
-      {/* Cantidad */}
-      <div className="flex flex-col items-center justify-center border border-gray-300 rounded">
+      {/* Quantity Control */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--spacing-2)',
+          border: '1px solid var(--color-gray-300)',
+          borderRadius: 'var(--border-radius-md)',
+          padding: 'var(--spacing-1)',
+        }}
+      >
         <button
-          onClick={() => onQuantityChange(item.id, Math.max(1, item.quantity - 1))}
-          className="w-8 h-8 hover:bg-gray-100"
+          onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '0 var(--spacing-2)',
+            fontWeight: 'var(--font-weight-bold)',
+          }}
         >
           −
         </button>
-        <span className="w-8 text-center font-semibold">{item.quantity}</span>
+        <input
+          type="number"
+          value={quantity}
+          onChange={(e) => onQuantityChange(Math.max(1, parseInt(e.target.value) || 1))}
+          style={{
+            width: '40px',
+            textAlign: 'center',
+            border: 'none',
+            fontSize: 'var(--font-size-base)',
+          }}
+        />
         <button
-          onClick={() => onQuantityChange(item.id, item.quantity + 1)}
-          className="w-8 h-8 hover:bg-gray-100"
+          onClick={() => onQuantityChange(quantity + 1)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '0 var(--spacing-2)',
+            fontWeight: 'var(--font-weight-bold)',
+          }}
         >
           +
         </button>
       </div>
 
-      {/* Subtotal */}
-      <div className="text-right flex flex-col justify-center">
-        <Price current={item.subtotal} size="sm" />
-        <button onClick={() => onRemove(item.id)} className="text-red-500 text-sm hover:underline mt-2">
-          Eliminar
-        </button>
+      {/* Price */}
+      <div
+        style={{
+          minWidth: '100px',
+          textAlign: 'right',
+          fontWeight: 'var(--font-weight-semibold)',
+        }}
+      >
+        <p>${(price * quantity).toFixed(2)}</p>
+      </div>
+
+      {/* Remove Button */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onRemove}
+        style={{ color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+      >
+        Remove
+      </Button>
+    </div>
+  )
+}
+
+// ======================== SEARCH BAR ========================
+
+export interface SearchBarProps {
+  /** Search placeholder text */
+  placeholder?: string
+  /** Current search value */
+  value?: string
+  /** Callback when search value changes */
+  onChange?: (value: string) => void
+  /** Callback when search is submitted */
+  onSearch?: (value: string) => void
+  /** Show search button */
+  showButton?: boolean
+  /** Additional className */
+  className?: string
+}
+
+/**
+ * SearchBar - Search input with optional button
+ * Combines: Input, Button
+ */
+export const SearchBar: React.FC<SearchBarProps> = ({
+  placeholder = 'Search products...',
+  value = '',
+  onChange,
+  onSearch,
+  showButton = true,
+  className = '',
+}) => {
+  const [localValue, setLocalValue] = useState(value)
+
+  return (
+    <div
+      className={className}
+      style={{
+        display: 'flex',
+        gap: 'var(--spacing-2)',
+        alignItems: 'center',
+      }}
+    >
+      <input
+        type="text"
+        placeholder={placeholder}
+        value={localValue}
+        onChange={(e) => {
+          setLocalValue(e.target.value)
+          onChange?.(e.target.value)
+        }}
+        onKeyPress={(e) => {
+          if (e.key === 'Enter') {
+            onSearch?.(localValue)
+          }
+        }}
+        style={{
+          flex: 1,
+          padding: 'var(--spacing-3) var(--spacing-4)',
+          border: '1px solid var(--color-gray-300)',
+          borderRadius: 'var(--border-radius-md)',
+          fontSize: 'var(--font-size-base)',
+        }}
+      />
+      {showButton && (
+        <Button
+          variant="primary"
+          size="base"
+          onClick={() => onSearch?.(localValue)}
+        >
+          🔍
+        </Button>
+      )}
+    </div>
+  )
+}
+
+// ======================== PRICE FILTER ========================
+
+export interface PriceFilterProps {
+  /** Minimum price range */
+  minPrice: number
+  /** Maximum price range */
+  maxPrice: number
+  /** Current minimum value */
+  currentMin?: number
+  /** Current maximum value */
+  currentMax?: number
+  /** Callback when filter changes */
+  onChange?: (min: number, max: number) => void
+  /** Currency symbol */
+  currency?: string
+  /** Additional className */
+  className?: string
+}
+
+/**
+ * PriceFilter - Range slider for price filtering
+ * Combines: Input (min), Input (max), Button (apply)
+ */
+export const PriceFilter: React.FC<PriceFilterProps> = ({
+  minPrice,
+  maxPrice,
+  currentMin = minPrice,
+  currentMax = maxPrice,
+  onChange,
+  currency = '$',
+  className = '',
+}) => {
+  const [min, setMin] = useState(currentMin)
+  const [max, setMax] = useState(currentMax)
+
+  return (
+    <div className={className}>
+      <h4 style={{ fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--spacing-3)' }}>
+        Price Range
+      </h4>
+      <div style={{ display: 'flex', gap: 'var(--spacing-2)', marginBottom: 'var(--spacing-2)' }}>
+        <input
+          type="number"
+          min={minPrice}
+          max={maxPrice}
+          value={min}
+          onChange={(e) => setMin(Math.max(minPrice, parseInt(e.target.value) || minPrice))}
+          placeholder="Min"
+          style={{
+            flex: 1,
+            padding: 'var(--spacing-2)',
+            border: '1px solid var(--color-gray-300)',
+            borderRadius: 'var(--border-radius-md)',
+          }}
+        />
+        <input
+          type="number"
+          min={minPrice}
+          max={maxPrice}
+          value={max}
+          onChange={(e) => setMax(Math.min(maxPrice, parseInt(e.target.value) || maxPrice))}
+          placeholder="Max"
+          style={{
+            flex: 1,
+            padding: 'var(--spacing-2)',
+            border: '1px solid var(--color-gray-300)',
+            borderRadius: 'var(--border-radius-md)',
+          }}
+        />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--spacing-3)' }}>
+        <span>{currency}{min}</span>
+        <span>{currency}{max}</span>
+      </div>
+      <Button
+        variant="primary"
+        size="sm"
+        isBlock
+        onClick={() => onChange?.(min, max)}
+      >
+        Apply
+      </Button>
+    </div>
+  )
+}
+
+// ======================== RATING FILTER ========================
+
+export interface RatingFilterProps {
+  /** Callback when rating is selected */
+  onChange?: (minRating: number) => void
+  /** Current selected rating */
+  currentRating?: number
+  /** Additional className */
+  className?: string
+}
+
+/**
+ * RatingFilter - Star rating filter for products
+ * Combines: Rating (clickable), Button
+ */
+export const RatingFilter: React.FC<RatingFilterProps> = ({
+  onChange,
+  currentRating = 0,
+  className = '',
+}) => {
+  return (
+    <div className={className}>
+      <h4 style={{ fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--spacing-3)' }}>
+        Rating
+      </h4>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-2)' }}>
+        {[5, 4, 3, 2, 1].map((rating) => (
+          <button
+            key={rating}
+            onClick={() => onChange?.(rating)}
+            style={{
+              background:
+                currentRating === rating
+                  ? 'var(--color-primary-light)'
+                  : 'transparent',
+              border: 'none',
+              padding: 'var(--spacing-2)',
+              borderRadius: 'var(--border-radius-md)',
+              cursor: 'pointer',
+              transition: 'all var(--transition-base)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-2)',
+            }}
+          >
+            {'★'.repeat(rating)}
+            {'☆'.repeat(5 - rating)}
+            <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-gray-600)' }}>
+              & up
+            </span>
+          </button>
+        ))}
       </div>
     </div>
   )
 }
 
-/**
- * ========== FORM GROUP COMPONENT ==========
- */
-export const FormGroup: FC<FormGroupProps> = ({
-  label,
-  children,
-  error = null,
-  required = false,
-  helperText = null,
-}) => {
-  return (
-    <div className="space-y-2">
-      {label && (
-        <label className="block text-sm font-semibold text-gray-700">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-      )}
-      {children}
-      {error && <p className="text-red-500 text-xs">{error}</p>}
-      {helperText && <p className="text-gray-600 text-xs">{helperText}</p>}
-    </div>
-  )
+// ======================== CATEGORY SELECTOR ========================
+
+export interface CategorySelectorProps {
+  /** Categories to display */
+  categories: Array<{ id: string; label: string }>
+  /** Currently selected category */
+  selected?: string
+  /** Callback when category changes */
+  onChange: (id: string) => void
+  /** Additional className */
+  className?: string
 }
 
 /**
- * ========== CATEGORY SELECTOR COMPONENT ==========
+ * CategorySelector - Button group for selecting categories
+ * Combines: Badge (styled as buttons), Button
  */
-export const CategorySelector: FC<CategorySelectorProps> = ({ categories, selected, onChange }) => {
+export const CategorySelector: React.FC<CategorySelectorProps> = ({
+  categories,
+  selected,
+  onChange,
+  className = '',
+}) => {
   return (
-    <div className="flex flex-wrap gap-2">
-      {categories.map(cat => (
+    <div
+      className={className}
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 'var(--spacing-2)',
+      }}
+    >
+      {categories.map((cat) => (
         <button
           key={cat.id}
           onClick={() => onChange(cat.id)}
-          className={`px-4 py-2 rounded-full font-semibold transition-colors ${
-            selected === cat.id
-              ? 'bg-primary text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
+          style={{
+            padding: 'var(--spacing-2) var(--spacing-4)',
+            borderRadius: 'var(--border-radius-full)',
+            fontWeight: 'var(--font-weight-semibold)',
+            transition: 'all var(--transition-base)',
+            border: selected === cat.id ? 'none' : '1px solid var(--color-gray-300)',
+            backgroundColor:
+              selected === cat.id
+                ? 'var(--color-primary)'
+                : 'var(--color-white)',
+            color: selected === cat.id ? 'var(--color-white)' : 'var(--color-gray-700)',
+            cursor: 'pointer',
+          }}
         >
           {cat.label}
         </button>
@@ -137,47 +584,147 @@ export const CategorySelector: FC<CategorySelectorProps> = ({ categories, select
   )
 }
 
+// ======================== INFO BOX ========================
+
+export interface InfoBoxProps {
+  /** Icon or emoji */
+  icon?: React.ReactNode
+  /** Title text */
+  title: string
+  /** Description text */
+  description: string
+  /** Box variant/style */
+  variant?: 'success' | 'warning' | 'error' | 'info'
+  /** Additional className */
+  className?: string
+}
+
 /**
- * ========== INFO BOX COMPONENT ==========
+ * InfoBox - Information box with icon and text
+ * Combines: Badge (color), Card
  */
-export const InfoBox: FC<InfoBoxProps> = ({
+export const InfoBox: React.FC<InfoBoxProps> = ({
   icon,
   title,
   description,
   variant = 'info',
+  className = '',
 }) => {
-  const styles = {
-    success: 'bg-green-50 border-green-200 text-green-700',
-    warning: 'bg-yellow-50 border-yellow-200 text-yellow-700',
-    error: 'bg-red-50 border-red-200 text-red-700',
-    info: 'bg-blue-50 border-blue-200 text-blue-700',
-  }
+  const variantStyles = {
+    success: {
+      bg: 'var(--color-success)',
+      border: 'var(--color-success)',
+    },
+    warning: {
+      bg: 'var(--color-warning)',
+      border: 'var(--color-warning)',
+    },
+    error: {
+      bg: 'var(--color-error)',
+      border: 'var(--color-error)',
+    },
+    info: {
+      bg: 'var(--color-info)',
+      border: 'var(--color-info)',
+    },
+  }[variant]
 
   return (
-    <div className={`border ${styles[variant]} p-4 rounded-lg flex gap-3`}>
-      <span className="text-2xl flex-shrink-0">{icon}</span>
+    <div
+      className={className}
+      style={{
+        border: `1px solid ${variantStyles.border}`,
+        borderRadius: 'var(--border-radius-md)',
+        padding: 'var(--spacing-4)',
+        display: 'flex',
+        gap: 'var(--spacing-3)',
+        backgroundColor: `${variantStyles.bg}15`,
+      }}
+    >
+      {icon && (
+        <span style={{ fontSize: '2rem', flexShrink: 0 }}>{icon}</span>
+      )}
       <div>
-        <p className="font-bold">{title}</p>
-        <p className="text-sm opacity-80">{description}</p>
+        <p style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-1)' }}>
+          {title}
+        </p>
+        <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-gray-600)' }}>
+          {description}
+        </p>
       </div>
     </div>
   )
 }
 
+// ======================== STAT ========================
+
+export interface StatProps {
+  /** Stat value/number */
+  value: string | number
+  /** Stat label */
+  label: string
+  /** Optional icon/emoji */
+  icon?: React.ReactNode
+  /** Optional trend percentage */
+  trend?: number
+  /** Additional className */
+  className?: string
+}
+
 /**
- * ========== STAT COMPONENT ==========
+ * Stat - Statistics card displaying value and label
+ * Combines: Card, Badge (for trend)
  */
-export const Stat: FC<StatProps> = ({ value, label, icon = null, trend = null }) => {
+export const Stat: React.FC<StatProps> = ({
+  value,
+  label,
+  icon,
+  trend,
+  className = '',
+}) => {
   return (
-    <div className="bg-white p-4 rounded-lg text-center border border-gray-200">
-      {icon && <p className="text-3xl mb-2">{icon}</p>}
-      <p className="text-3xl font-bold text-primary">{value}</p>
-      <p className="text-gray-600 text-sm mt-1">{label}</p>
-      {trend && (
-        <p className={`text-xs mt-2 ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-          {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
+    <Card className={className}>
+      <div
+        style={{
+          padding: 'var(--spacing-4)',
+          textAlign: 'center',
+        }}
+      >
+        {icon && (
+          <p style={{ fontSize: '2rem', marginBottom: 'var(--spacing-2)' }}>
+            {icon}
+          </p>
+        )}
+        <p
+          style={{
+            fontSize: 'var(--font-size-2xl)',
+            fontWeight: 'var(--font-weight-bold)',
+            color: 'var(--color-primary)',
+            marginBottom: 'var(--spacing-1)',
+          }}
+        >
+          {value}
         </p>
-      )}
-    </div>
+        <p
+          style={{
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--color-gray-600)',
+          }}
+        >
+          {label}
+        </p>
+        {trend !== undefined && (
+          <p
+            style={{
+              fontSize: 'var(--font-size-xs)',
+              marginTop: 'var(--spacing-2)',
+              color: trend > 0 ? 'var(--color-success)' : 'var(--color-error)',
+            }}
+          >
+            {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
+          </p>
+        )}
+      </div>
+    </Card>
   )
 }

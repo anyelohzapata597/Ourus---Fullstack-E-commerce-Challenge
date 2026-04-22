@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Crear cuenta en ShopHub">
+    <title>Registrarse - ShopHub</title>
+    
+    <!-- CSS System -->
+    <link rel="stylesheet" href="../src/styles/variables.css">
+    <link rel="stylesheet" href="../src/styles/global.css">
+    <link rel="stylesheet" href="../src/styles/components.css">
+    <link rel="stylesheet" href="../src/styles/responsive.css">
+    <link rel="stylesheet" href="../src/styles/animations.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-4);
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .auth-card {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-2xl);
+            padding: var(--spacing-8);
+            animation: slideInUp var(--transition-slow);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: var(--spacing-8);
+        }
+
+        .auth-logo {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .auth-header h1 {
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .auth-header p {
+            color: var(--color-gray-600);
+            margin: 0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-4);
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-4);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-2);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-gray-900);
+            font-size: var(--font-size-sm);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: var(--spacing-2) var(--spacing-3);
+            border: var(--border-width-1) solid var(--color-gray-300);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-base);
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .password-requirements {
+            background: var(--color-gray-50);
+            padding: var(--spacing-3);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-xs);
+            color: var(--color-gray-700);
+            margin-top: var(--spacing-2);
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .requirement.met {
+            color: var(--color-success);
+        }
+
+        .requirement::before {
+            content: '✗';
+            font-weight: bold;
+        }
+
+        .requirement.met::before {
+            content: '✓';
+        }
+
+        .form-options {
+            margin: var(--spacing-6) 0;
+        }
+
+        .form-options label {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-2);
+            margin-bottom: var(--spacing-4);
+            font-weight: var(--font-weight-normal);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+        }
+
+        .form-options input {
+            margin-top: var(--spacing-1);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: var(--spacing-4);
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            color: var(--color-white);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            margin-bottom: var(--spacing-6);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .auth-footer {
+            text-align: center;
+            color: var(--color-gray-600);
+            font-size: var(--font-size-sm);
+        }
+
+        .auth-footer a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .auth-card {
+                padding: var(--spacing-6);
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">🛍️</div>
+                <h1>ShopHub</h1>
+                <p>Crea tu cuenta gratis</p>
+            </div>
+
+            <form id="register-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstname">Nombre</label>
+                        <input type="text" id="firstname" name="firstname" placeholder="Juan" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastname">Apellido</label>
+                        <input type="text" id="lastname" name="lastname" placeholder="García" required>
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="tu@email.com" required>
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                        <div class="password-requirements">
+                            <div class="requirement" id="req-length">Al menos 8 caracteres</div>
+                            <div class="requirement" id="req-upper">Al menos una mayúscula</div>
+                            <div class="requirement" id="req-number">Al menos un número</div>
+                            <div class="requirement" id="req-special">Al menos un carácter especial</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label for="confirm-password">Confirmar Contraseña</label>
+                        <input type="password" id="confirm-password" name="confirm-password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox" name="terms" required>
+                        <span>Acepto los <a href="#" style="color: var(--color-primary);">términos y condiciones</a> y la <a href="#" style="color: var(--color-primary);">política de privacidad</a></span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="newsletter" checked>
+                        <span>Enviarme ofertas y novedades por email</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-submit">Crear Cuenta</button>
+            </form>
+
+            <div class="auth-footer">
+                ¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm-password');
+
+        const requirements = {
+            length: document.getElementById('req-length'),
+            upper: document.getElementById('req-upper'),
+            number: document.getElementById('req-number'),
+            special: document.getElementById('req-special')
+        };
+
+        function checkPassword() {
+            const password = passwordInput.value;
+
+            // Check length
+            if (password.length >= 8) {
+                requirements.length.classList.add('met');
+            } else {
+                requirements.length.classList.remove('met');
+            }
+
+            // Check uppercase
+            if (/[A-Z]/.test(password)) {
+                requirements.upper.classList.add('met');
+            } else {
+                requirements.upper.classList.remove('met');
+            }
+
+            // Check number
+            if (/\d/.test(password)) {
+                requirements.number.classList.add('met');
+            } else {
+                requirements.number.classList.remove('met');
+            }
+
+            // Check special character
+            if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                requirements.special.classList.add('met');
+            } else {
+                requirements.special.classList.remove('met');
+            }
+        }
+
+        passwordInput.addEventListener('input', checkPassword);
+
+        document.getElementById('register-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Validate passwords match
+            if (passwordInput.value !== confirmPassword.value) {
+                alert('Las contraseñas no coinciden.');
+                return;
+            }
+
+            // Validate password requirements
+            const allMet = Object.values(requirements).every(req => 
+                req.classList.contains('met')
+            );
+
+            if (!allMet) {
+                alert('Por favor, cumple todos los requisitos de contraseña.');
+                return;
+            }
+
+            alert('¡Cuenta creada exitosamente! En producción aquí se registraría el usuario.');
+        });
+    </script>
+</body>
+</html>

@@ -1,11 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* 🌐 Estilos Globales */
 
-/* Importar animaciones */
+@import './variables.css';
+@import './components.css';
+@import './responsive.css';
 @import './animations.css';
 
-/* Reset y estilos base */
+/* ===== RESET ===== */
 * {
   margin: 0;
   padding: 0;
@@ -14,10 +14,18 @@
 
 html {
   scroll-behavior: smooth;
+  font-size: 16px;
 }
 
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.6;
+  color: var(--color-gray-900);
+  background-color: var(--color-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   color: #1f2937;
   background-color: #ffffff;
   line-height: 1.6;

@@ -43,9 +43,13 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Separar vendor code
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'zustand': ['zustand'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules/react')) {
+            return 'react-vendor';
+          }
+          if (id.includes('node_modules/zustand')) {
+            return 'zustand-vendor';
+          }
         },
       },
     },

@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Detalle del producto - ShopHub">
+    <title>Detalle del Producto - ShopHub</title>
+    
+    <!-- CSS System -->
+    <link rel="stylesheet" href="../src/styles/variables.css">
+    <link rel="stylesheet" href="../src/styles/global.css">
+    <link rel="stylesheet" href="../src/styles/components.css">
+    <link rel="stylesheet" href="../src/styles/responsive.css">
+    <link rel="stylesheet" href="../src/styles/animations.css">
+    
+    <style>
+        .breadcrumb {
+            display: flex;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-8);
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .product-detail-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-12);
+            padding: var(--spacing-8) var(--spacing-4);
+        }
+
+        .product-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-4);
+        }
+
+        .product-main-image {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
+            border-radius: var(--border-radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .product-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-3);
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 80px;
+            background: var(--color-gray-100);
+            border-radius: var(--border-radius-md);
+            border: var(--border-width-2) solid var(--color-gray-300);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .thumbnail:hover {
+            border-color: var(--color-primary);
+        }
+
+        .thumbnail.active {
+            border-color: var(--color-primary);
+            background: var(--color-primary-light);
+        }
+
+        /* Product Info */
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-6);
+        }
+
+        .product-header h1 {
+            font-size: var(--font-size-4xl);
+            margin: 0 0 var(--spacing-2) 0;
+        }
+
+        .product-category {
+            display: inline-block;
+            background: var(--color-primary-light);
+            color: var(--color-primary);
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .rating-section {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-4);
+            padding-bottom: var(--spacing-6);
+            border-bottom: var(--border-width-1) solid var(--color-gray-200);
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: var(--spacing-1);
+            font-size: var(--font-size-2xl);
+            color: #FFC107;
+        }
+
+        .rating-text {
+            color: var(--color-gray-600);
+            font-size: var(--font-size-sm);
+        }
+
+        .rating-text a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        .price-section {
+            padding: var(--spacing-6) 0;
+            border-bottom: var(--border-width-1) solid var(--color-gray-200);
+        }
+
+        .price {
+            font-size: var(--font-size-5xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .original-price {
+            font-size: var(--font-size-lg);
+            color: var(--color-gray-400);
+            text-decoration: line-through;
+            margin-right: var(--spacing-3);
+        }
+
+        .discount-badge {
+            display: inline-block;
+            background: var(--color-error);
+            color: var(--color-white);
+            padding: var(--spacing-1) var(--spacing-3);
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .stock-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            font-size: var(--font-size-sm);
+            color: var(--color-success);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .description-section {
+            padding: var(--spacing-6) 0;
+            border-bottom: var(--border-width-1) solid var(--color-gray-200);
+        }
+
+        .description-section h3 {
+            font-size: var(--font-size-base);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .description-text {
+            color: var(--color-gray-700);
+            line-height: 1.8;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-3);
+            color: var(--color-gray-700);
+        }
+
+        .features-list li::before {
+            content: "✓";
+            color: var(--color-success);
+            font-weight: var(--font-weight-bold);
+            flex-shrink: 0;
+        }
+
+        /* Actions */
+        .actions-section {
+            padding: var(--spacing-6) 0;
+            border-bottom: var(--border-width-1) solid var(--color-gray-200);
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-6);
+        }
+
+        .quantity-label {
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            border: var(--border-width-1) solid var(--color-gray-300);
+            border-radius: var(--border-radius-md);
+            width: fit-content;
+        }
+
+        .quantity-input button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: var(--font-size-lg);
+            transition: all var(--transition-base);
+        }
+
+        .quantity-input button:hover {
+            background: var(--color-gray-100);
+        }
+
+        .quantity-input input {
+            width: 60px;
+            height: 40px;
+            border: none;
+            text-align: center;
+            font-size: var(--font-size-base);
+            border-left: var(--border-width-1) solid var(--color-gray-300);
+            border-right: var(--border-width-1) solid var(--color-gray-300);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-4);
+        }
+
+        .action-buttons .btn {
+            padding: var(--spacing-4) var(--spacing-6);
+            font-size: var(--font-size-base);
+        }
+
+        /* Tabs */
+        .tabs {
+            margin-top: var(--spacing-8);
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: var(--spacing-4);
+            border-bottom: var(--border-width-2) solid var(--color-gray-200);
+            margin-bottom: var(--spacing-6);
+        }
+
+        .tab-button {
+            padding: var(--spacing-4);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-gray-600);
+            border-bottom: var(--border-width-3) solid transparent;
+            transition: all var(--transition-base);
+        }
+
+        .tab-button:hover {
+            color: var(--color-primary);
+        }
+
+        .tab-button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn var(--transition-base);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .review-item {
+            padding: var(--spacing-6);
+            border: var(--border-width-1) solid var(--color-gray-200);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .review-author {
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .review-date {
+            color: var(--color-gray-500);
+            font-size: var(--font-size-sm);
+        }
+
+        .review-rating {
+            color: #FFC107;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .review-text {
+            color: var(--color-gray-700);
+        }
+
+        /* Related Products */
+        .related-section {
+            margin-top: var(--spacing-16);
+            padding-top: var(--spacing-12);
+            border-top: var(--border-width-2) solid var(--color-gray-200);
+        }
+
+        .related-section h2 {
+            margin-bottom: var(--spacing-8);
+        }
+
+        .related-products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--spacing-6);
+        }
+
+        .related-card {
+            background: var(--color-white);
+            border: var(--border-width-1) solid var(--color-gray-200);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            transition: all var(--transition-base);
+        }
+
+        .related-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .related-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-4xl);
+        }
+
+        .related-info {
+            padding: var(--spacing-4);
+        }
+
+        .related-title {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .related-price {
+            color: var(--color-primary);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-lg);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-6);
+            }
+
+            .product-main-image {
+                height: 300px;
+                font-size: 3rem;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .related-products {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .product-detail-container {
+                padding: var(--spacing-4);
+            }
+
+            .price {
+                font-size: var(--font-size-4xl);
+            }
+
+            .product-thumbnails {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .related-products {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-buttons {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <nav class="container" style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-4); background: var(--color-white); box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; gap: var(--spacing-3);">
+                <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: var(--spacing-2);">
+                    <h1 style="margin: 0; font-size: var(--font-size-2xl); color: var(--color-primary);">🛍️ ShopHub</h1>
+                </a>
+            </div>
+            <ul style="display: flex; list-style: none; gap: var(--spacing-8); margin: 0;">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="products.html">Productos</a></li>
+                <li><a href="cart.html">Carrito</a></li>
+                <li><a href="login.html" class="btn btn-primary btn-sm">Ingresar</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="index.html">Inicio</a>
+            <span>/</span>
+            <a href="products.html">Productos</a>
+            <span>/</span>
+            <span>Electrónica</span>
+            <span>/</span>
+            <span class="current">Laptop Pro 15"</span>
+        </div>
+
+        <!-- Product Detail -->
+        <div class="product-detail-container">
+            <!-- Gallery -->
+            <div class="product-gallery">
+                <div class="product-main-image">💻</div>
+                <div class="product-thumbnails">
+                    <div class="thumbnail active">💻</div>
+                    <div class="thumbnail">💻</div>
+                    <div class="thumbnail">💻</div>
+                    <div class="thumbnail">💻</div>
+                </div>
+            </div>
+
+            <!-- Info -->
+            <div class="product-info">
+                <div class="product-header">
+                    <span class="product-category">Electrónica</span>
+                    <h1>Laptop Pro 15"</h1>
+                </div>
+
+                <!-- Rating -->
+                <div class="rating-section">
+                    <div class="rating-stars">★★★★★</div>
+                    <div class="rating-text">
+                        <strong>4.8</strong> (234 reseñas) | 
+                        <a href="#reviews">Ver reseñas</a>
+                    </div>
+                </div>
+
+                <!-- Price -->
+                <div class="price-section">
+                    <div style="display: flex; align-items: center; margin-bottom: var(--spacing-3);">
+                        <span class="original-price">$1,499.99</span>
+                        <span class="discount-badge">-13% DESCUENTO</span>
+                    </div>
+                    <div class="price">$1,299.99</div>
+                    <div class="stock-info">
+                        ✓ En stock (15 disponibles)
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="description-section">
+                    <h3>Descripción del Producto</h3>
+                    <p class="description-text">
+                        Laptop potente diseñada para profesionales exigentes. Procesador de última generación, pantalla 4K de 15 pulgadas, 16GB RAM y SSD de 512GB. Perfecta para desarrollo, diseño y edición de contenido.
+                    </p>
+                    <h3 style="margin-top: var(--spacing-6);">Características Principales</h3>
+                    <ul class="features-list">
+                        <li>Procesador Intel Core i7 de 13ª generación</li>
+                        <li>Pantalla 4K de 15.6 pulgadas</li>
+                        <li>16GB RAM LPDDR5</li>
+                        <li>SSD de 512GB NVMe</li>
+                        <li>Tarjeta gráfica NVIDIA RTX 3050</li>
+                        <li>Batería de 10 horas</li>
+                        <li>Peso: 2.1kg</li>
+                        <li>Garantía de 2 años</li>
+                    </ul>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions-section">
+                    <div class="quantity-selector">
+                        <label class="quantity-label">Cantidad:</label>
+                        <div class="quantity-input">
+                            <button>−</button>
+                            <input type="number" value="1" min="1" max="100">
+                            <button>+</button>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">🛒 Agregar al Carrito</button>
+                        <button class="btn btn-outline">❤️ Guardar</button>
+                    </div>
+                </div>
+
+                <!-- Additional Info -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-4); padding: var(--spacing-6) 0;">
+                    <div>
+                        <strong style="color: var(--color-gray-900);">Envío Gratis</strong>
+                        <p style="color: var(--color-gray-600); font-size: var(--font-size-sm); margin: var(--spacing-1) 0 0 0;">En compras mayores a $50</p>
+                    </div>
+                    <div>
+                        <strong style="color: var(--color-gray-900);">Garantía de 30 días</strong>
+                        <p style="color: var(--color-gray-600); font-size: var(--font-size-sm); margin: var(--spacing-1) 0 0 0;">Devolución sin preguntas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="specifications">Especificaciones</button>
+                <button class="tab-button" data-tab="reviews">Reseñas</button>
+                <button class="tab-button" data-tab="shipping">Envíos y Devoluciones</button>
+            </div>
+
+            <!-- Specifications Tab -->
+            <div id="specifications" class="tab-content active">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="border-bottom: var(--border-width-1) solid var(--color-gray-200);">
+                        <td style="padding: var(--spacing-4); font-weight: var(--font-weight-semibold); color: var(--color-gray-700);">Procesador</td>
+                        <td style="padding: var(--spacing-4);">Intel Core i7 de 13ª generación</td>
+                    </tr>
+                    <tr style="border-bottom: var(--border-width-1) solid var(--color-gray-200);">
+                        <td style="padding: var(--spacing-4); font-weight: var(--font-weight-semibold); color: var(--color-gray-700);">Pantalla</td>
+                        <td style="padding: var(--spacing-4);">15.6" 4K IPS</td>
+                    </tr>
+                    <tr style="border-bottom: var(--border-width-1) solid var(--color-gray-200);">
+                        <td style="padding: var(--spacing-4); font-weight: var(--font-weight-semibold); color: var(--color-gray-700);">RAM</td>
+                        <td style="padding: var(--spacing-4);">16GB LPDDR5</td>
+                    </tr>
+                    <tr style="border-bottom: var(--border-width-1) solid var(--color-gray-200);">
+                        <td style="padding: var(--spacing-4); font-weight: var(--font-weight-semibold); color: var(--color-gray-700);">Almacenamiento</td>
+                        <td style="padding: var(--spacing-4);">512GB SSD NVMe</td>
+                    </tr>
+                    <tr style="border-bottom: var(--border-width-1) solid var(--color-gray-200);">
+                        <td style="padding: var(--spacing-4); font-weight: var(--font-weight-semibold); color: var(--color-gray-700);">Gráficos</td>
+                        <td style="padding: var(--spacing-4);">NVIDIA GeForce RTX 3050</td>
+                    </tr>
+                    <tr style="border-bottom: var(--border-width-1) solid var(--color-gray-200);">
+                        <td style="padding: var(--spacing-4); font-weight: var(--font-weight-semibold); color: var(--color-gray-700);">Batería</td>
+                        <td style="padding: var(--spacing-4);">10 horas de duración</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: var(--spacing-4); font-weight: var(--font-weight-semibold); color: var(--color-gray-700);">Peso</td>
+                        <td style="padding: var(--spacing-4);">2.1 kg</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Reviews Tab -->
+            <div id="reviews" class="tab-content">
+                <div style="margin-bottom: var(--spacing-8);">
+                    <h3 style="margin-bottom: var(--spacing-4);">Agregar tu reseña</h3>
+                    <div class="form-group">
+                        <label>Calificación:</label>
+                        <div class="rating-stars" style="font-size: var(--font-size-2xl); margin-top: var(--spacing-2); cursor: pointer;">
+                            <span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="review-text">Tu reseña:</label>
+                        <textarea id="review-text" placeholder="Comparte tu experiencia..."></textarea>
+                    </div>
+                    <button class="btn btn-primary">Enviar Reseña</button>
+                </div>
+
+                <h3 style="margin-bottom: var(--spacing-6); margin-top: var(--spacing-8);">Reseñas de Clientes</h3>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-author">Juan García</span>
+                        <span class="review-date">hace 5 días</span>
+                    </div>
+                    <div class="review-rating">★★★★★</div>
+                    <p class="review-text">Excelente laptop. Muy rápida, pantalla hermosa y buena batería. Totalmente recomendada para trabajo profesional.</p>
+                </div>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-author">María López</span>
+                        <span class="review-date">hace 10 días</span>
+                    </div>
+                    <div class="review-rating">★★★★☆</div>
+                    <p class="review-text">Muy buen producto, aunque un poco cara. La construcción es sólida y funciona perfecto.</p>
+                </div>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-author">Carlos Rodríguez</span>
+                        <span class="review-date">hace 15 días</span>
+                    </div>
+                    <div class="review-rating">★★★★★</div>
+                    <p class="review-text">Muy satisfecho con la compra. Envío rápido, producto en perfecto estado. Recomiendo 100%.</p>
+                </div>
+            </div>
+
+            <!-- Shipping Tab -->
+            <div id="shipping" class="tab-content">
+                <div style="background: var(--color-gray-50); padding: var(--spacing-6); border-radius: var(--border-radius-lg);">
+                    <h3 style="margin-top: 0;">Política de Envíos</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: var(--spacing-4);">
+                            <strong>Envío Estándar:</strong> 3-5 días hábiles (Gratis en compras &gt; $50)
+                        </li>
+                        <li style="margin-bottom: var(--spacing-4);">
+                            <strong>Envío Express:</strong> 1-2 días hábiles ($9.99)
+                        </li>
+                        <li style="margin-bottom: var(--spacing-4);">
+                            <strong>Overnight:</strong> Entrega al siguiente día ($29.99)
+                        </li>
+                    </ul>
+
+                    <h3>Política de Devoluciones</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: var(--spacing-4);">
+                            Tienes <strong>30 días</strong> para devolver el producto sin preguntas
+                        </li>
+                        <li style="margin-bottom: var(--spacing-4);">
+                            El producto debe estar sin usar y en su empaque original
+                        </li>
+                        <li style="margin-bottom: var(--spacing-4);">
+                            El envío de devolución corre por nuestra cuenta
+                        </li>
+                        <li style="margin-bottom: var(--spacing-4);">
+                            Se procesa un reembolso completo en 5-7 días hábiles
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        <div class="related-section">
+            <h2>Productos Relacionados</h2>
+            <div class="related-products">
+                <div class="related-card">
+                    <div class="related-image">🖱️</div>
+                    <div class="related-info">
+                        <p class="related-title">Mouse Inalámbrico</p>
+                        <p style="color: var(--color-gray-600); font-size: var(--font-size-sm); margin: 0 0 var(--spacing-2) 0;">Electrónica</p>
+                        <p class="related-price">$29.99</p>
+                        <button class="btn btn-primary btn-sm" style="width: 100%; margin-top: var(--spacing-3);">Ver</button>
+                    </div>
+                </div>
+
+                <div class="related-card">
+                    <div class="related-image">⌨️</div>
+                    <div class="related-info">
+                        <p class="related-title">Teclado Mecánico RGB</p>
+                        <p style="color: var(--color-gray-600); font-size: var(--font-size-sm); margin: 0 0 var(--spacing-2) 0;">Electrónica</p>
+                        <p class="related-price">$89.99</p>
+                        <button class="btn btn-primary btn-sm" style="width: 100%; margin-top: var(--spacing-3);">Ver</button>
+                    </div>
+                </div>
+
+                <div class="related-card">
+                    <div class="related-image">🖥️</div>
+                    <div class="related-info">
+                        <p class="related-title">Monitor 4K 27"</p>
+                        <p style="color: var(--color-gray-600); font-size: var(--font-size-sm); margin: 0 0 var(--spacing-2) 0;">Electrónica</p>
+                        <p class="related-price">$399.99</p>
+                        <button class="btn btn-primary btn-sm" style="width: 100%; margin-top: var(--spacing-3);">Ver</button>
+                    </div>
+                </div>
+
+                <div class="related-card">
+                    <div class="related-image">🎧</div>
+                    <div class="related-info">
+                        <p class="related-title">Auriculares ANC</p>
+                        <p style="color: var(--color-gray-600); font-size: var(--font-size-sm); margin: 0 0 var(--spacing-2) 0;">Electrónica</p>
+                        <p class="related-price">$199.99</p>
+                        <button class="btn btn-primary btn-sm" style="width: 100%; margin-top: var(--spacing-3);">Ver</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: var(--color-gray-900); color: var(--color-gray-100); padding: var(--spacing-12) var(--spacing-4); margin-top: var(--spacing-16);">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-8); margin-bottom: var(--spacing-8);">
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Sobre ShopHub</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Acerca de</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Blog</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Carreras</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Soporte</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Centro de Ayuda</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Contacto</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Estado</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Legal</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Privacidad</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Términos</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Cookies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Síguenos</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Facebook</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Twitter</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid var(--color-gray-700); padding-top: var(--spacing-6); text-align: center; color: var(--color-gray-400);">
+                <p>&copy; 2026 ShopHub. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Tab switching
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.getAttribute('data-tab');
+                
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                button.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
