@@ -1,279 +1,720 @@
 import { FC, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { Product, SearchFilters } from '../types'
-import ProductCard from '@components/molecules/ProductCard'
-import Pagination from '@components/Pagination'
-import ItemsPerPageSelector from '@components/ItemsPerPageSelector'
+import type { Product } from '@types/index'
 import { useProducts, usePagination } from '@hooks/index'
-import apiService from '@services/index'
+import { ProductCard } from '@components/molecules/molecules'
+
+interface FiltersState {
+  searchQuery: string
+  category: string | null
+  priceMin: number
+  priceMax: number
+  ratingMin: number
+  inStock: boolean
+}
 
 /**
- * ProductsPage - Página de listado de productos con filtros, búsqueda y paginación
+ * ProductsPage - Listado de productos con sidebar filtros
+ * ✅ TASK 5: Sidebar A + Búsqueda con botón B + Filtros completos C + Paginación A + Sin ordenamiento B
+ * 
+ * Estructura:
+ * - Left: Sidebar con filtros (categoría, precio, rating, stock)
+ * - Right: Grid de productos + paginación tradicional
  */
 const ProductsPage: FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { products, isLoading, error } = useProducts()
-  const [showFilters, setShowFilters] = useState(false)
+  const { products, isLoading } = useProducts()
   const [categories, setCategories] = useState<string[]>([])
-  const [filters, setFilters] = useState<SearchFilters>({
-    category: searchParams.get('category') || undefined,
-    sortBy: 'newest',
+
+  // Estados de filtros
+  const [filters, setFilters] = useState<FiltersState>({
+    searchQuery: searchParams.get('q') || '',
+    category: searchParams.get('category') || null,
+    priceMin: parseInt(searchParams.get('priceMin') || '0'),
+    priceMax: parseInt(searchParams.get('priceMax') || '5000'),
+    ratingMin: parseInt(searchParams.get('ratingMin') || '0'),
+    inStock: searchParams.get('inStock') === 'true' || false,
   })
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000])
-  const [searchQuery, setSearchQuery] = useState('')
-  const [sortedProducts, setSortedProducts] = useState<Product[]>([])
-  const [itemsPerPage, setItemsPerPage] = useState(
-    parseInt(searchParams.get('itemsPerPage') || '6')
-  )
+
+  // Input temporal para búsqueda (antes de hacer click)
+  const [searchInput, setSearchInput] = useState(filters.searchQuery)
 
   // Paginación
+  const itemsPerPage = 12
   const initialPage = parseInt(searchParams.get('page') || '1')
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const { currentPage, totalPages, paginatedItems, goToPage } = usePagination({
-    items: sortedProducts,
+    items: filteredProducts,
     itemsPerPage,
     initialPage,
   })
 
-  // Actualizar URL cuando cambia página o items por página
+  // Extraer categorías únicas de products
   useEffect(() => {
-    setSearchParams(prev => {
-      prev.set('page', currentPage.toString())
-      prev.set('itemsPerPage', itemsPerPage.toString())
-      return prev
-    })
-  }, [currentPage, itemsPerPage, setSearchParams])
-
-  // Cargar categorías del API
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const cats = await apiService.getCategories()
-        setCategories(cats)
-      } catch (err) {
-        console.error('Error loading categories:', err)
-      }
+    if (products.length > 0) {
+      const uniqueCategories = Array.from(new Set(products.map(p => p.category)))
+      setCategories(uniqueCategories as string[])
     }
-    loadCategories()
-  }, [])
+  }, [products])
 
-  // Actualizar productos cuando cambian filtros o productos
+  // Aplicar filtros a los productos
   useEffect(() => {
     let filtered = products
+
+    // Filtro de búsqueda
+    if (filters.searchQuery) {
+      const q = filters.searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        p =>
+          p.title.toLowerCase().includes(q) ||
+          p.description?.toLowerCase().includes(q)
+      )
+    }
 
     // Filtro de categoría
     if (filters.category) {
       filtered = filtered.filter(p => p.category === filters.category)
     }
 
-    // Filtro de rango de precio
+    // Filtro de precio
     filtered = filtered.filter(
-      p => p.price >= priceRange[0] && p.price <= priceRange[1]
+      p => p.price >= filters.priceMin && p.price <= filters.priceMax
     )
 
-    // Filtro de búsqueda
-    if (searchQuery) {
-      const queryLower = searchQuery.toLowerCase()
-      filtered = filtered.filter(p =>
-        p.title.toLowerCase().includes(queryLower) ||
-        p.description.toLowerCase().includes(queryLower)
-      )
-    }
-
-    // Ordenamiento
-    const sorted = [...filtered].sort((a: Product, b: Product) => {
-      switch (filters.sortBy) {
-        case 'price-asc':
-          return a.price - b.price
-        case 'price-desc':
-          return b.price - a.price
-        case 'rating':
-          return b.rating.rate - a.rating.rate
-        default:
-          return 0
-      }
+    // Filtro de rating (redondeado)
+    filtered = filtered.filter(p => {
+      const rating = typeof p.rating === 'object' ? p.rating.rate : p.rating
+      return rating >= filters.ratingMin
     })
 
-    setSortedProducts(sorted)
-    // Reset a página 1 cuando cambian los filtros
-    goToPage(1)
-  }, [products, filters, priceRange, searchQuery, goToPage])
+    // Filtro de stock
+    if (filters.inStock) {
+      filtered = filtered.filter(p => p.stock !== undefined && p.stock > 0)
+    }
+
+    setFilteredProducts(filtered)
+    goToPage(1) // Reset a página 1
+  }, [filters, products, goToPage])
+
+  // Actualizar URL cuando cambia página
+  useEffect(() => {
+    const params = new URLSearchParams()
+    params.set('page', currentPage.toString())
+    if (filters.searchQuery) params.set('q', filters.searchQuery)
+    if (filters.category) params.set('category', filters.category)
+    if (filters.priceMin !== 0) params.set('priceMin', filters.priceMin.toString())
+    if (filters.priceMax !== 5000) params.set('priceMax', filters.priceMax.toString())
+    if (filters.ratingMin > 0) params.set('ratingMin', filters.ratingMin.toString())
+    if (filters.inStock) params.set('inStock', 'true')
+    setSearchParams(params)
+  }, [currentPage, filters, setSearchParams])
+
+  // Manejadores de filtros
+  const handleSearch = () => {
+    setFilters(prev => ({ ...prev, searchQuery: searchInput }))
+  }
+
+  const handleCategoryChange = (category: string | null) => {
+    setFilters(prev => ({ ...prev, category }))
+  }
+
+  const handlePriceChange = (min: number, max: number) => {
+    setFilters(prev => ({ ...prev, priceMin: min, priceMax: max }))
+  }
+
+  const handleRatingChange = (rating: number) => {
+    setFilters(prev => ({ ...prev, ratingMin: rating }))
+  }
+
+  const handleStockChange = (checked: boolean) => {
+    setFilters(prev => ({ ...prev, inStock: checked }))
+  }
+
+  const resetFilters = () => {
+    setSearchInput('')
+    setFilters({
+      searchQuery: '',
+      category: null,
+      priceMin: 0,
+      priceMax: 5000,
+      ratingMin: 0,
+      inStock: false,
+    })
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 animate-fade-in-down">
-          Productos
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-gray-50)' }}>
+      <div
+        style={{
+          maxWidth: '80rem',
+          margin: '0 auto',
+          padding: 'var(--spacing-6)',
+        }}
+      >
+        {/* Título */}
+        <h1
+          style={{
+            fontSize: 'var(--font-size-3xl)',
+            fontWeight: 'var(--font-weight-bold)',
+            marginBottom: 'var(--spacing-8)',
+            color: 'var(--color-gray-900)',
+            animation: 'fadeInDown 0.8s ease-out',
+          }}
+        >
+          🛍️ Productos
         </h1>
 
-        {/* Error State */}
-        {error && (
-          <div className="mb-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            <p className="font-bold">Error: {error}</p>
-            <p className="text-sm">Por favor intenta nuevamente</p>
-          </div>
-        )}
-
-        {/* Mobile Filter Toggle */}
-        <div className="lg:hidden mb-4">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="w-full flex items-center justify-between gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold"
+        {/* Main Grid: Sidebar + Products */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '250px 1fr',
+            gap: 'var(--spacing-8)',
+          }}
+        >
+          {/* ========== SIDEBAR FILTROS (P1: A - Izquierda) ========== */}
+          <aside
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--spacing-6)',
+            }}
           >
-            <span>🔍 {showFilters ? 'Ocultar' : 'Mostrar'} Filtros</span>
-            <span className={`transition-transform ${showFilters ? 'rotate-180' : ''}`}>▼</span>
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
-          {/* Sidebar Filters */}
-          <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden'} lg:block`}>
-            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:sticky lg:top-24">
-              <h2 className="text-xl font-bold mb-6">Filtros</h2>
-
-              {/* Search */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold mb-2">Buscar</label>
+            {/* Búsqueda con Botón (P2: B) */}
+            <div
+              style={{
+                backgroundColor: 'var(--color-white)',
+                padding: 'var(--spacing-6)',
+                borderRadius: 'var(--border-radius-lg)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 'var(--font-size-lg)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  marginBottom: 'var(--spacing-3)',
+                  color: 'var(--color-gray-900)',
+                }}
+              >
+                Buscar
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-3)' }}>
                 <input
                   type="text"
-                  placeholder="Buscar productos..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Ej: iPhone, laptop..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  style={{
+                    padding: 'var(--spacing-2) var(--spacing-3)',
+                    border: '1px solid var(--color-gray-300)',
+                    borderRadius: 'var(--border-radius-base)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontFamily: 'var(--font-family-base)',
+                    transition: 'border-color 0.3s ease',
+                  } as React.CSSProperties}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-primary)'
+                    e.currentTarget.style.outline = 'none'
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-gray-300)'
+                  }}
                 />
-              </div>
-
-              {/* Categories */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold mb-2">Categoría</label>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setFilters({ ...filters, category: undefined })}
-                    className={`block w-full text-left px-3 py-2 rounded ${
-                      !filters.category
-                        ? 'bg-primary text-white'
-                        : 'hover:bg-gray-100'
-                    }`}
-                  >
-                    Todas ({products.length})
-                  </button>
-                  {categories.map((cat) => {
-                    const count = products.filter(p => p.category === cat).length
-                    return (
-                      <button
-                        key={cat}
-                        onClick={() => setFilters({ ...filters, category: cat })}
-                        className={`block w-full text-left px-3 py-2 rounded ${
-                          filters.category === cat
-                            ? 'bg-primary text-white'
-                            : 'hover:bg-gray-100'
-                        }`}
-                      >
-                        {cat.charAt(0).toUpperCase() + cat.slice(1)} ({count})
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Price Range */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold mb-2">
-                  Precio: ${priceRange[0]} - ${priceRange[1]}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="1000"
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                  className="w-full"
-                />
-              </div>
-
-              {/* Sort */}
-              <div>
-                <label className="block text-sm font-semibold mb-2">Ordenar</label>
-                <select
-                  value={filters.sortBy}
-                  onChange={(e) => setFilters({ ...filters, sortBy: e.target.value as any })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                <button
+                  onClick={handleSearch}
+                  style={{
+                    padding: 'var(--spacing-2) var(--spacing-4)',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-white)',
+                    border: 'none',
+                    borderRadius: 'var(--border-radius-base)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    fontSize: 'var(--font-size-sm)',
+                  } as React.CSSProperties}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-dark)'
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary)'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                  }}
                 >
-                  <option value="newest">Más Nuevo</option>
-                  <option value="price-asc">Precio: Menor a Mayor</option>
-                  <option value="price-desc">Precio: Mayor a Menor</option>
-                  <option value="rating">Mejor Valorado</option>
-                </select>
+                  🔍 Buscar
+                </button>
               </div>
             </div>
-          </div>
 
-          {/* Products Grid */}
-          <div className="lg:col-span-3">
-            {/* Loading State */}
-            {isLoading && (
-              <div className="flex justify-center items-center py-12">
-                <div className="text-center">
-                  <div className="inline-block w-8 h-8 border-4 border-gray-300 border-t-primary rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-600">Cargando productos...</p>
-                </div>
-              </div>
-            )}
-
-            {/* Results Controls */}
-            {!isLoading && (
-              <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-                <div className="text-sm text-gray-600">
-                  Mostrando {paginatedItems.length} de {sortedProducts.length} productos (Total: {products.length})
-                </div>
-                <ItemsPerPageSelector
-                  value={itemsPerPage}
-                  onChange={(value) => {
-                    setItemsPerPage(value)
-                    goToPage(1)
+            {/* Filtro de Categoría (P3: C) */}
+            <div
+              style={{
+                backgroundColor: 'var(--color-white)',
+                padding: 'var(--spacing-6)',
+                borderRadius: 'var(--border-radius-lg)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 'var(--font-size-lg)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  marginBottom: 'var(--spacing-3)',
+                  color: 'var(--color-gray-900)',
+                }}
+              >
+                Categoría
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-2)' }}>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--spacing-2)',
+                    cursor: 'pointer',
+                    fontSize: 'var(--font-size-sm)',
                   }}
-                />
+                >
+                  <input
+                    type="radio"
+                    name="category"
+                    checked={filters.category === null}
+                    onChange={() => handleCategoryChange(null)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  Todas
+                </label>
+                {categories.map(cat => (
+                  <label
+                    key={cat}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--spacing-2)',
+                      cursor: 'pointer',
+                      fontSize: 'var(--font-size-sm)',
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="category"
+                      checked={filters.category === cat}
+                      onChange={() => handleCategoryChange(cat)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    {cat}
+                  </label>
+                ))}
               </div>
-            )}
+            </div>
 
-            {/* Products List */}
-            {!isLoading && paginatedItems.length > 0 && (
-              <div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {paginatedItems.map((product: Product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
+            {/* Filtro de Precio (P3: C) */}
+            <div
+              style={{
+                backgroundColor: 'var(--color-white)',
+                padding: 'var(--spacing-6)',
+                borderRadius: 'var(--border-radius-lg)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 'var(--font-size-lg)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  marginBottom: 'var(--spacing-3)',
+                  color: 'var(--color-gray-900)',
+                }}
+              >
+                Precio
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-3)' }}>
+                <div>
+                  <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-gray-600)' }}>
+                    Mín: ${filters.priceMin}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="5000"
+                    value={filters.priceMin}
+                    onChange={(e) =>
+                      handlePriceChange(
+                        parseInt(e.target.value),
+                        filters.priceMax
+                      )
+                    }
+                    style={{
+                      width: '100%',
+                      cursor: 'pointer',
+                    }}
+                  />
                 </div>
+                <div>
+                  <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-gray-600)' }}>
+                    Máx: ${filters.priceMax}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="5000"
+                    value={filters.priceMax}
+                    onChange={(e) =>
+                      handlePriceChange(
+                        filters.priceMin,
+                        parseInt(e.target.value)
+                      )
+                    }
+                    style={{
+                      width: '100%',
+                      cursor: 'pointer',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
 
-                {/* Pagination Controls */}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={goToPage}
-                  canGoNext={currentPage < totalPages}
-                  canGoPrev={currentPage > 1}
+            {/* Filtro de Rating (P3: C) */}
+            <div
+              style={{
+                backgroundColor: 'var(--color-white)',
+                padding: 'var(--spacing-6)',
+                borderRadius: 'var(--border-radius-lg)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 'var(--font-size-lg)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  marginBottom: 'var(--spacing-3)',
+                  color: 'var(--color-gray-900)',
+                }}
+              >
+                Rating
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-2)' }}>
+                {[0, 1, 2, 3, 4].map(rating => (
+                  <label
+                    key={rating}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--spacing-2)',
+                      cursor: 'pointer',
+                      fontSize: 'var(--font-size-sm)',
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="rating"
+                      checked={filters.ratingMin === rating}
+                      onChange={() => handleRatingChange(rating)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    {rating === 0 ? 'Todas' : `${rating}⭐ y arriba`}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Filtro de Stock (P3: C) */}
+            <div
+              style={{
+                backgroundColor: 'var(--color-white)',
+                padding: 'var(--spacing-6)',
+                borderRadius: 'var(--border-radius-lg)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              }}
+            >
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-2)',
+                  cursor: 'pointer',
+                  fontSize: 'var(--font-size-sm)',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={filters.inStock}
+                  onChange={(e) => handleStockChange(e.target.checked)}
+                  style={{ cursor: 'pointer', width: '18px', height: '18px' }}
                 />
+                Solo en stock
+              </label>
+            </div>
+
+            {/* Botón Reset */}
+            <button
+              onClick={resetFilters}
+              style={{
+                padding: 'var(--spacing-3) var(--spacing-4)',
+                backgroundColor: 'var(--color-gray-200)',
+                color: 'var(--color-gray-900)',
+                border: 'none',
+                borderRadius: 'var(--border-radius-base)',
+                fontWeight: 'var(--font-weight-semibold)',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                fontSize: 'var(--font-size-sm)',
+              } as React.CSSProperties}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-gray-300)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-gray-200)'
+              }}
+            >
+              🔄 Limpiar Filtros
+            </button>
+          </aside>
+
+          {/* ========== PRODUCTOS GRID + PAGINACIÓN (P4: A - Tradicional) ========== */}
+          <section>
+            {/* Contador de resultados */}
+            <div
+              style={{
+                marginBottom: 'var(--spacing-6)',
+                color: 'var(--color-gray-600)',
+                fontSize: 'var(--font-size-sm)',
+              }}
+            >
+              Mostrando <strong>{paginatedItems.length}</strong> de{' '}
+              <strong>{filteredProducts.length}</strong> productos
+              {filters.searchQuery && ` para "${filters.searchQuery}"`}
+            </div>
+
+            {/* Loading */}
+            {isLoading && (
+              <div
+                style={{
+                  textAlign: 'center' as const,
+                  padding: 'var(--spacing-16)',
+                  color: 'var(--color-gray-500)',
+                }}
+              >
+                <p>⏳ Cargando productos...</p>
               </div>
             )}
 
-            {/* No Results */}
-            {!isLoading && sortedProducts.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-xl text-gray-600 mb-4">
-                  No hay productos que coincidan con tus filtros
+            {/* Sin resultados */}
+            {!isLoading && paginatedItems.length === 0 && (
+              <div
+                style={{
+                  textAlign: 'center' as const,
+                  padding: 'var(--spacing-16)',
+                  backgroundColor: 'var(--color-white)',
+                  borderRadius: 'var(--border-radius-lg)',
+                  color: 'var(--color-gray-500)',
+                }}
+              >
+                <p style={{ fontSize: 'var(--font-size-lg)', marginBottom: 'var(--spacing-4)' }}>
+                  😔 No se encontraron productos
                 </p>
                 <button
-                  onClick={() => {
-                    setFilters({ sortBy: 'newest' })
-                    setPriceRange([0, 1000])
-                    setSearchQuery('')
-                  }}
-                  className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                  onClick={resetFilters}
+                  style={{
+                    padding: 'var(--spacing-2) var(--spacing-4)',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-white)',
+                    border: 'none',
+                    borderRadius: 'var(--border-radius-base)',
+                    cursor: 'pointer',
+                    fontSize: 'var(--font-size-sm)',
+                  } as React.CSSProperties}
                 >
                   Limpiar Filtros
                 </button>
               </div>
             )}
-          </div>
+
+            {/* Grid de Productos */}
+            {!isLoading && paginatedItems.length > 0 && (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                  gap: 'var(--spacing-6)',
+                  marginBottom: 'var(--spacing-8)',
+                }}
+              >
+                {paginatedItems.map(product => (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    title={product.title}
+                    image={product.image}
+                    price={product.price}
+                    originalPrice={Math.round(product.price * 1.2)}
+                    rating={
+                      typeof product.rating === 'object'
+                        ? product.rating.rate
+                        : product.rating
+                    }
+                    reviewCount={
+                      typeof product.rating === 'object'
+                        ? product.rating.count
+                        : 0
+                    }
+                    discount={20}
+                    inStock={product.stock !== undefined && product.stock > 0}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Paginación Tradicional (P4: A) */}
+            {!isLoading && filteredProducts.length > 0 && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-2)',
+                  padding: 'var(--spacing-6)',
+                  backgroundColor: 'var(--color-white)',
+                  borderRadius: 'var(--border-radius-lg)',
+                  flexWrap: 'wrap' as const,
+                }}
+              >
+                {/* Botón Anterior */}
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  style={{
+                    padding: 'var(--spacing-2) var(--spacing-3)',
+                    backgroundColor:
+                      currentPage === 1 ? 'var(--color-gray-200)' : 'var(--color-primary)',
+                    color: currentPage === 1 ? 'var(--color-gray-500)' : 'var(--color-white)',
+                    border: 'none',
+                    borderRadius: 'var(--border-radius-base)',
+                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    transition: 'all 0.3s ease',
+                  } as React.CSSProperties}
+                  onMouseEnter={(e) => {
+                    if (currentPage > 1) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-primary-dark)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentPage > 1) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-primary)'
+                    }
+                  }}
+                >
+                  ← Anterior
+                </button>
+
+                {/* Números de página */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const pageNum =
+                    totalPages <= 5
+                      ? i + 1
+                      : Math.max(
+                          1,
+                          Math.min(
+                            currentPage - 2 + i,
+                            totalPages - 4 + i
+                          )
+                        )
+                  if (pageNum < 1 || pageNum > totalPages) return null
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => goToPage(pageNum)}
+                      style={{
+                        padding: 'var(--spacing-2) var(--spacing-3)',
+                        backgroundColor:
+                          currentPage === pageNum
+                            ? 'var(--color-primary)'
+                            : 'var(--color-gray-100)',
+                        color:
+                          currentPage === pageNum
+                            ? 'var(--color-white)'
+                            : 'var(--color-gray-900)',
+                        border: 'none',
+                        borderRadius: 'var(--border-radius-base)',
+                        cursor: 'pointer',
+                        fontSize: 'var(--font-size-sm)',
+                        fontWeight: 'var(--font-weight-semibold)',
+                        minWidth: '36px',
+                        transition: 'all 0.3s ease',
+                      } as React.CSSProperties}
+                      onMouseEnter={(e) => {
+                        if (currentPage !== pageNum) {
+                          e.currentTarget.style.backgroundColor = 'var(--color-gray-200)'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (currentPage !== pageNum) {
+                          e.currentTarget.style.backgroundColor = 'var(--color-gray-100)'
+                        }
+                      }}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                })}
+
+                {/* Botón Siguiente */}
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  style={{
+                    padding: 'var(--spacing-2) var(--spacing-3)',
+                    backgroundColor:
+                      currentPage === totalPages
+                        ? 'var(--color-gray-200)'
+                        : 'var(--color-primary)',
+                    color:
+                      currentPage === totalPages
+                        ? 'var(--color-gray-500)'
+                        : 'var(--color-white)',
+                    border: 'none',
+                    borderRadius: 'var(--border-radius-base)',
+                    cursor:
+                      currentPage === totalPages ? 'not-allowed' : 'pointer',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    transition: 'all 0.3s ease',
+                  } as React.CSSProperties}
+                  onMouseEnter={(e) => {
+                    if (currentPage < totalPages) {
+                      e.currentTarget.style.backgroundColor =
+                        'var(--color-primary-dark)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentPage < totalPages) {
+                      e.currentTarget.style.backgroundColor =
+                        'var(--color-primary)'
+                    }
+                  }}
+                >
+                  Siguiente →
+                </button>
+
+                {/* Info de página actual */}
+                <div
+                  style={{
+                    marginLeft: 'var(--spacing-4)',
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--color-gray-600)',
+                    flexBasis: '100%',
+                    textAlign: 'center' as const,
+                  }}
+                >
+                  Página {currentPage} de {totalPages}
+                </div>
+              </div>
+            )}
+          </section>
         </div>
       </div>
     </div>
