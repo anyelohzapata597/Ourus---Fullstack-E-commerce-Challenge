@@ -1,43 +1,86 @@
-import { RouteObject } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { RouteObject } from 'react-router-dom'
+import { lazy, Suspense, FC } from 'react'
 
-// Pages - Lazy loading para code splitting
-const HomePage = lazy(() => import('@pages/HomePage'));
-const ProductsPage = lazy(() => import('@pages/ProductsPage'));
-const ProductDetailPage = lazy(() => import('@pages/ProductDetailPage'));
-const CartPage = lazy(() => import('@pages/CartPage'));
-const CheckoutPage = lazy(() => import('@pages/CheckoutPage'));
-const LoginPage = lazy(() => import('@pages/LoginPage'));
-const RegisterPage = lazy(() => import('@pages/RegisterPage'));
-const AboutPage = lazy(() => import('@pages/AboutPage'));
-const ContactPage = lazy(() => import('@pages/ContactPage'));
-const TermsPage = lazy(() => import('@pages/TermsPage'));
-const NotFoundPage = lazy(() => import('@pages/NotFoundPage'));
+// ========== PAGES - Lazy Loading para code splitting ========== 
+const HomePage = lazy(() => import('@pages/HomePage'))
+const ProductsPage = lazy(() => import('@pages/ProductsPage'))
+const ProductDetailPage = lazy(() => import('@pages/ProductDetailPage'))
+const CartPage = lazy(() => import('@pages/CartPage'))
+const CheckoutPage = lazy(() => import('@pages/CheckoutPage'))
+const LoginPage = lazy(() => import('@pages/LoginPage'))
+const RegisterPage = lazy(() => import('@pages/RegisterPage'))
+const AboutPage = lazy(() => import('@pages/AboutPage'))
+const ContactPage = lazy(() => import('@pages/ContactPage'))
+const TermsPage = lazy(() => import('@pages/TermsPage'))
+const NotFoundPage = lazy(() => import('@pages/NotFoundPage'))
 
-// Layouts
-const MainLayout = lazy(() => import('@components/layouts/MainLayout'));
+// ========== LAYOUTS
+const MainLayout = lazy(() => import('@components/layouts/MainLayout'))
 
-// Loading Fallback - Spinner inline
-const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+/**
+ * PageLoader - Loading fallback para Suspense
+ * ✅ CSS variables + inline styles (SIN Tailwind)
+ */
+const PageLoader: FC = () => (
+  <div
+    style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'var(--color-gray-50)',
+    }}
+  >
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 'var(--spacing-4)',
+      }}
+    >
+      <div
+        style={{
+          width: '48px',
+          height: '48px',
+          border: '4px solid var(--color-gray-200)',
+          borderTop: '4px solid var(--color-primary)',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+        }}
+      />
+      <p style={{ color: 'var(--color-gray-600)', fontSize: 'var(--font-size-sm)' }}>
+        ⏳ Cargando...
+      </p>
+    </div>
   </div>
-);
+)
 
-// Wrapper para Suspense
-const withSuspense = (Component: any) => (
+/**
+ * withSuspense - Wrapper para agregar Suspense a componentes
+ */
+const withSuspense = (Component: React.LazyExoticComponent<any>) => (
   <Suspense fallback={<PageLoader />}>
     <Component />
   </Suspense>
-);
+)
 
 /**
- * Rutas principales de la aplicación
+ * TASK 6: React Router v7 Configuration
+ * ✅ P1: Rutas públicas + protegidas (C)
+ * ✅ P2: Lazy loading con React.lazy() (A)
+ * ✅ P3: 404 visual + opción volver (C)
+ * ✅ P4: routes/index.tsx separado (C)
  */
 export const routes: RouteObject[] = [
+  // ========== RUTAS PÚBLICAS - Con MainLayout ==========
   {
     path: '/',
-    element: <Suspense fallback={<PageLoader />}><MainLayout /></Suspense>,
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <MainLayout />
+      </Suspense>
+    ),
     children: [
       {
         index: true,
@@ -73,6 +116,8 @@ export const routes: RouteObject[] = [
       },
     ],
   },
+
+  // ========== RUTAS DE AUTENTICACIÓN - Sin MainLayout ==========
   {
     path: '/auth',
     children: [
@@ -86,10 +131,12 @@ export const routes: RouteObject[] = [
       },
     ],
   },
+
+  // ========== RUTA 404 - Catch all ==========
   {
     path: '*',
     element: withSuspense(NotFoundPage),
   },
-];
+]
 
-export default routes;
+export default routes
