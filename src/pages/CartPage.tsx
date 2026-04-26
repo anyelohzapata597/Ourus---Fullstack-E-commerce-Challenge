@@ -94,13 +94,6 @@ const CartPage: FC = () => {
   }
 
   const handleCheckout = () => {
-    if (!isAuthenticated) {
-      navigate('/auth/register', {
-        state: { from: { pathname: '/checkout' } },
-      })
-      return
-    }
-
     navigate('/checkout')
   }
 
@@ -635,7 +628,7 @@ const CartPage: FC = () => {
                 e.currentTarget.style.boxShadow = 'none'
               }}
             >
-              {isAuthenticated ? '✓ Proceder al Pago' : 'Registrarse para finalizar'}
+              {isAuthenticated ? 'Proceder al pago' : 'Comprar como invitado'}
             </button>
 
             {/* Clear Cart Button */}

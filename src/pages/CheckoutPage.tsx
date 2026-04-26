@@ -74,14 +74,14 @@ const CheckoutPage: FC = () => {
           city: vals.city,
           state: vals.state,
           zipCode: vals.zipCode,
-        })
+        }).errors
       } else if (currentStep === 'payment') {
         return validatePaymentForm({
           cardNumber: vals.cardNumber,
           cardholderName: vals.cardholderName,
           expiryDate: vals.expiryDate,
           cvv: vals.cvv,
-        })
+        }).errors
       }
       return {}
     },
@@ -335,6 +335,24 @@ const CheckoutPage: FC = () => {
               {currentStep === 'payment' && (
                 <div className="space-y-6 animate-fade-in">
                   <h2 className="text-2xl font-bold">💳 Información de Pago</h2>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">Nombre en la tarjeta *</label>
+                    <input
+                      type="text"
+                      name="cardholderName"
+                      value={values.cardholderName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                        touched.cardholderName && errors.cardholderName ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="Juan Perez"
+                    />
+                    {touched.cardholderName && errors.cardholderName && (
+                      <p className="text-red-500 text-sm mt-1">{errors.cardholderName}</p>
+                    )}
+                  </div>
 
                   <div>
                     <label className="block text-sm font-semibold mb-2">Número de Tarjeta *</label>
