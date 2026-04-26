@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Checkout - Ourus">
+    <title>Checkout - Ourus</title>
+    
+    <!-- CSS System -->
+    <link rel="stylesheet" href="../src/styles/variables.css">
+    <link rel="stylesheet" href="../src/styles/global.css">
+    <link rel="stylesheet" href="../src/styles/components.css">
+    <link rel="stylesheet" href="../src/styles/responsive.css">
+    <link rel="stylesheet" href="../src/styles/animations.css">
+    
+    <style>
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: var(--spacing-8);
+            padding: var(--spacing-8) var(--spacing-4);
+        }
+
+        .steps-progress {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-12);
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: var(--border-width-2) solid var(--color-gray-300);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-gray-600);
+            margin-bottom: var(--spacing-3);
+            transition: all var(--transition-base);
+        }
+
+        .step.active .step-number {
+            background: var(--color-primary);
+            color: var(--color-white);
+            border-color: var(--color-primary);
+        }
+
+        .step.completed .step-number {
+            background: var(--color-success);
+            color: var(--color-white);
+            border-color: var(--color-success);
+        }
+
+        .step-name {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .step.active .step-name {
+            color: var(--color-primary);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .checkout-form {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-8);
+        }
+
+        .form-section {
+            margin-bottom: var(--spacing-12);
+        }
+
+        .form-section h2 {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-6);
+            padding-bottom: var(--spacing-4);
+            border-bottom: var(--border-width-2) solid var(--color-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-6);
+            margin-bottom: var(--spacing-6);
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-6);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-2);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-6);
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-4);
+            border: var(--border-width-2) solid var(--color-gray-300);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .payment-option:hover {
+            border-color: var(--color-primary);
+        }
+
+        .payment-option input {
+            margin-right: var(--spacing-3);
+            cursor: pointer;
+            width: auto;
+        }
+
+        .payment-option.selected {
+            border-color: var(--color-primary);
+            background: var(--color-primary-light);
+        }
+
+        /* Order Summary */
+        .order-summary {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-6);
+            height: fit-content;
+            position: sticky;
+            top: var(--spacing-4);
+        }
+
+        .order-summary h2 {
+            font-size: var(--font-size-lg);
+            margin: 0 0 var(--spacing-6) 0;
+            padding-bottom: var(--spacing-6);
+            border-bottom: var(--border-width-2) solid var(--color-gray-200);
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-3) 0;
+            border-bottom: var(--border-width-1) solid var(--color-gray-200);
+            font-size: var(--font-size-sm);
+        }
+
+        .order-item.total {
+            border: none;
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-base);
+            color: var(--color-primary);
+            padding: var(--spacing-6) 0 var(--spacing-3) 0;
+        }
+
+        .form-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-6);
+            margin-top: var(--spacing-12);
+        }
+
+        .form-actions .btn {
+            padding: var(--spacing-4);
+        }
+
+        /* Hidden steps */
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+            animation: fadeIn var(--transition-base);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+
+            .order-summary {
+                position: static;
+            }
+
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .checkout-form {
+                padding: var(--spacing-4);
+            }
+
+            .steps-progress {
+                gap: var(--spacing-2);
+            }
+
+            .step-number {
+                width: 40px;
+                height: 40px;
+                font-size: var(--font-size-sm);
+            }
+
+            .step-name {
+                font-size: var(--font-size-xs);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <nav class="container" style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-4); background: var(--color-white); box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; gap: var(--spacing-3);">
+                <a href="index.html" style="text-decoration: none;">
+                    <h1 style="margin: 0; font-size: var(--font-size-2xl); color: var(--color-primary);">🛍️ Ourus</h1>
+                </a>
+            </div>
+            <ul style="display: flex; list-style: none; gap: var(--spacing-8); margin: 0;">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="products.html">Productos</a></li>
+                <li><a href="cart.html">Carrito</a></li>
+                <li><a href="login.html" class="btn btn-primary btn-sm">Ingresar</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Steps Progress -->
+        <div class="steps-progress">
+            <div class="step completed">
+                <div class="step-number">✓</div>
+                <div class="step-name">Carrito</div>
+            </div>
+            <div class="step active">
+                <div class="step-number">1</div>
+                <div class="step-name">Envío</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-name">Pago</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-name">Confirmación</div>
+            </div>
+        </div>
+
+        <div class="checkout-container">
+            <!-- Checkout Form -->
+            <form class="checkout-form">
+                <!-- STEP 1: Shipping -->
+                <div class="step-content active" id="step-1">
+                    <div class="form-section">
+                        <h2>Información de Envío</h2>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fname">Nombre</label>
+                                <input type="text" id="fname" name="fname" placeholder="Juan" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lname">Apellido</label>
+                                <input type="text" id="lname" name="lname" placeholder="García" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" placeholder="tu@email.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label for="address">Calle y Número</label>
+                                <input type="text" id="address" name="address" placeholder="Calle Principal 123" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">Ciudad</label>
+                                <input type="text" id="city" name="city" placeholder="Madrid" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="zip">Código Postal</label>
+                                <input type="text" id="zip" name="zip" placeholder="28001" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label for="country">País</label>
+                                <select id="country" name="country" required>
+                                    <option>España</option>
+                                    <option>México</option>
+                                    <option>Argentina</option>
+                                    <option>Colombia</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h3 style="margin-top: var(--spacing-8); margin-bottom: var(--spacing-4);">Método de Envío</h3>
+                        
+                        <div class="form-row full">
+                            <label style="display: flex; align-items: flex-start; gap: var(--spacing-4); cursor: pointer; padding: var(--spacing-4); border: var(--border-width-1) solid var(--color-gray-300); border-radius: var(--border-radius-md);">
+                                <input type="radio" name="shipping" value="standard" checked required>
+                                <div>
+                                    <strong>Envío Estándar - Gratis</strong>
+                                    <p style="margin: var(--spacing-1) 0 0 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">3-5 días hábiles</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="form-row full">
+                            <label style="display: flex; align-items: flex-start; gap: var(--spacing-4); cursor: pointer; padding: var(--spacing-4); border: var(--border-width-1) solid var(--color-gray-300); border-radius: var(--border-radius-md);">
+                                <input type="radio" name="shipping" value="express" required>
+                                <div>
+                                    <strong>Envío Express - $9.99</strong>
+                                    <p style="margin: var(--spacing-1) 0 0 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">1-2 días hábiles</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Payment -->
+                <div class="step-content" id="step-2">
+                    <div class="form-section">
+                        <h2>Método de Pago</h2>
+                        
+                        <h3 style="margin-bottom: var(--spacing-4);">Selecciona tu método de pago</h3>
+                        
+                        <div class="payment-methods">
+                            <label class="payment-option selected">
+                                <input type="radio" name="payment" value="card" checked required>
+                                <span>💳 Tarjeta de Crédito</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="paypal" required>
+                                <span>🅿️ PayPal</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="transfer" required>
+                                <span>🏦 Transferencia</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="apple" required>
+                                <span>🍎 Apple Pay</span>
+                            </label>
+                        </div>
+
+                        <!-- Card Details -->
+                        <div id="card-details">
+                            <h3 style="margin: var(--spacing-6) 0 var(--spacing-4) 0;">Detalles de la Tarjeta</h3>
+
+                            <div class="form-row full">
+                                <div class="form-group">
+                                    <label for="cardname">Nombre en la Tarjeta</label>
+                                    <input type="text" id="cardname" name="cardname" placeholder="Juan García">
+                                </div>
+                            </div>
+
+                            <div class="form-row full">
+                                <div class="form-group">
+                                    <label for="cardnumber">Número de Tarjeta</label>
+                                    <input type="text" id="cardnumber" name="cardnumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expiry">Vencimiento</label>
+                                    <input type="text" id="expiry" name="expiry" placeholder="MM/AA" maxlength="5">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="3">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Confirmation -->
+                <div class="step-content" id="step-3">
+                    <div class="form-section">
+                        <h2>Confirmar Orden</h2>
+                        
+                        <div style="background: var(--color-gray-50); padding: var(--spacing-6); border-radius: var(--border-radius-md); margin-bottom: var(--spacing-6);">
+                            <h3 style="margin-top: 0;">Resumen de la Orden</h3>
+                            <p><strong>Cliente:</strong> Juan García</p>
+                            <p><strong>Email:</strong> juan@email.com</p>
+                            <p><strong>Dirección:</strong> Calle Principal 123, Madrid 28001, España</p>
+                            <p><strong>Método de Envío:</strong> Estándar (3-5 días)</p>
+                            <p><strong>Método de Pago:</strong> Tarjeta de Crédito</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="display: flex; gap: var(--spacing-3); cursor: pointer;">
+                                <input type="checkbox" name="terms" required>
+                                <span>Acepto los <a href="#" style="color: var(--color-primary);">términos y condiciones</a></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="display: flex; gap: var(--spacing-3); cursor: pointer;">
+                                <input type="checkbox" name="newsletter" checked>
+                                <span>Enviarme ofertas exclusivas por email</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="prev-btn" style="display: none;">← Anterior</button>
+                    <button type="button" class="btn btn-primary" id="next-btn">Siguiente →</button>
+                </div>
+            </form>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <h2>Resumen de Orden</h2>
+
+                <div class="order-item">
+                    <span>Laptop Pro 15" x1</span>
+                    <span>$1,299.99</span>
+                </div>
+
+                <div class="order-item">
+                    <span>Mouse Inalámbrico x2</span>
+                    <span>$59.98</span>
+                </div>
+
+                <div class="order-item">
+                    <span>Teclado Mecánico RGB x1</span>
+                    <span>$89.99</span>
+                </div>
+
+                <div class="order-item">
+                    <span>Subtotal</span>
+                    <span>$1,449.96</span>
+                </div>
+
+                <div class="order-item">
+                    <span>Envío</span>
+                    <span id="shipping-cost">Gratis</span>
+                </div>
+
+                <div class="order-item">
+                    <span>Impuestos (21%)</span>
+                    <span>$304.49</span>
+                </div>
+
+                <div class="order-item total">
+                    <span>Total</span>
+                    <span id="total-price">$1,754.45</span>
+                </div>
+
+                <div style="background: var(--color-success); color: var(--color-white); padding: var(--spacing-4); border-radius: var(--border-radius-md); margin-top: var(--spacing-6); text-align: center; font-size: var(--font-size-sm);">
+                    ✓ Tu compra está protegida
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: var(--color-gray-900); color: var(--color-gray-100); padding: var(--spacing-12) var(--spacing-4); margin-top: var(--spacing-16);">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-8); margin-bottom: var(--spacing-8);">
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Sobre Ourus</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Acerca de</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Blog</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Carreras</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Soporte</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Centro de Ayuda</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Contacto</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Estado</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Legal</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Privacidad</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Términos</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Cookies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Síguenos</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Facebook</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Twitter</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid var(--color-gray-700); padding-top: var(--spacing-6); text-align: center; color: var(--color-gray-400);">
+                <p>&copy; 2026 Ourus. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+
+        function updateStep() {
+            // Hide all step contents
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step-${i}`).classList.remove('active');
+            }
+
+            // Show current step
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+
+            // Update button states
+            prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+            nextBtn.textContent = currentStep === totalSteps ? 'Confirmar Orden' : 'Siguiente →';
+
+            // Update progress
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const stepNum = index;
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (stepNum === currentStep - 1) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+
+            // Update shipping cost
+            if (currentStep === 1) {
+                const shippingRadios = document.querySelectorAll('input[name="shipping"]');
+                const shippingCost = document.getElementById('shipping-cost');
+                const totalPrice = document.getElementById('total-price');
+                
+                shippingRadios.forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        const isExpress = radio.value === 'express';
+                        shippingCost.textContent = isExpress ? '$9.99' : 'Gratis';
+                        totalPrice.textContent = isExpress ? '$1,764.44' : '$1,754.45';
+                    });
+                });
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStep();
+            } else {
+                // Submit form
+                alert('¡Orden confirmada! Gracias por tu compra.');
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStep();
+            }
+        });
+
+        // Initialize
+        updateStep();
+    </script>
+</body>
+</html>

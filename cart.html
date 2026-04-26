@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Carrito de compras - Ourus">
+    <title>Carrito - Ourus</title>
+    
+    <!-- CSS System -->
+    <link rel="stylesheet" href="../src/styles/variables.css">
+    <link rel="stylesheet" href="../src/styles/global.css">
+    <link rel="stylesheet" href="../src/styles/components.css">
+    <link rel="stylesheet" href="../src/styles/responsive.css">
+    <link rel="stylesheet" href="../src/styles/animations.css">
+    
+    <style>
+        .cart-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: var(--spacing-8);
+            padding: var(--spacing-8) var(--spacing-4);
+        }
+
+        .cart-items {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .cart-header {
+            padding: var(--spacing-6);
+            border-bottom: var(--border-width-1) solid var(--color-gray-200);
+            background: var(--color-gray-50);
+        }
+
+        .cart-header h1 {
+            margin: 0;
+            font-size: var(--font-size-2xl);
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            gap: var(--spacing-6);
+            padding: var(--spacing-6);
+            border-bottom: var(--border-width-1) solid var(--color-gray-200);
+            align-items: center;
+        }
+
+        .cart-item-image {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .cart-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2);
+        }
+
+        .cart-item-title {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-gray-900);
+        }
+
+        .cart-item-description {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+        }
+
+        .cart-item-price {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary);
+            font-size: var(--font-size-lg);
+        }
+
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            border: var(--border-width-1) solid var(--color-gray-300);
+            border-radius: var(--border-radius-md);
+        }
+
+        .quantity-controls button {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+        }
+
+        .quantity-controls button:hover {
+            background: var(--color-gray-100);
+        }
+
+        .quantity-controls input {
+            width: 40px;
+            height: 30px;
+            border: none;
+            text-align: center;
+            border-left: var(--border-width-1) solid var(--color-gray-300);
+            border-right: var(--border-width-1) solid var(--color-gray-300);
+        }
+
+        .remove-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-error);
+            cursor: pointer;
+            font-size: var(--font-size-lg);
+            transition: all var(--transition-base);
+        }
+
+        .remove-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .empty-cart {
+            padding: var(--spacing-12);
+            text-align: center;
+            color: var(--color-gray-600);
+        }
+
+        .empty-cart-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .empty-cart h2 {
+            margin-bottom: var(--spacing-4);
+        }
+
+        /* Sidebar Summary */
+        .cart-summary {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-6);
+            height: fit-content;
+            position: sticky;
+            top: var(--spacing-4);
+        }
+
+        .cart-summary h2 {
+            font-size: var(--font-size-xl);
+            margin: 0 0 var(--spacing-6) 0;
+            padding-bottom: var(--spacing-6);
+            border-bottom: var(--border-width-2) solid var(--color-gray-200);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-4);
+            font-size: var(--font-size-sm);
+        }
+
+        .summary-row.total {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            border-top: var(--border-width-1) solid var(--color-gray-200);
+            padding-top: var(--spacing-4);
+            margin-top: var(--spacing-4);
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: var(--spacing-4);
+            margin-top: var(--spacing-6);
+        }
+
+        .continue-shopping {
+            width: 100%;
+            padding: var(--spacing-3);
+            margin-top: var(--spacing-3);
+        }
+
+        .promo-section {
+            margin-top: var(--spacing-6);
+            padding-top: var(--spacing-6);
+            border-top: var(--border-width-1) solid var(--color-gray-200);
+        }
+
+        .promo-label {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .promo-input {
+            display: flex;
+            gap: var(--spacing-2);
+        }
+
+        .promo-input input {
+            flex: 1;
+            padding: var(--spacing-2) var(--spacing-3);
+        }
+
+        .promo-input button {
+            padding: var(--spacing-2) var(--spacing-4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cart-container {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-summary {
+                position: static;
+            }
+
+            .cart-item {
+                grid-template-columns: 80px 1fr;
+                gap: var(--spacing-4);
+            }
+
+            .cart-item-actions {
+                grid-column: 1 / -1;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .cart-container {
+                padding: var(--spacing-4);
+            }
+
+            .cart-item {
+                grid-template-columns: 60px 1fr;
+            }
+
+            .cart-item-image {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <nav class="container" style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-4); background: var(--color-white); box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; gap: var(--spacing-3);">
+                <a href="index.html" style="text-decoration: none;">
+                    <h1 style="margin: 0; font-size: var(--font-size-2xl); color: var(--color-primary);">🛍️ Ourus</h1>
+                </a>
+            </div>
+            <ul style="display: flex; list-style: none; gap: var(--spacing-8); margin: 0;">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="products.html">Productos</a></li>
+                <li><a href="cart.html" style="color: var(--color-primary); font-weight: var(--font-weight-semibold);">Carrito</a></li>
+                <li><a href="login.html" class="btn btn-primary btn-sm">Ingresar</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="cart-container">
+            <!-- Cart Items -->
+            <div class="cart-items">
+                <div class="cart-header">
+                    <h1>Carrito de Compras</h1>
+                </div>
+
+                <!-- Cart Item 1 -->
+                <div class="cart-item fade-in-up">
+                    <div class="cart-item-image">💻</div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-title">Laptop Pro 15"</div>
+                        <div class="cart-item-description">Electrónica • En stock</div>
+                        <div class="cart-item-price">$1,299.99</div>
+                    </div>
+                    <div class="cart-item-actions">
+                        <div class="quantity-controls">
+                            <button>−</button>
+                            <input type="number" value="1" min="1">
+                            <button>+</button>
+                        </div>
+                        <button class="remove-btn" title="Eliminar">✕</button>
+                    </div>
+                </div>
+
+                <!-- Cart Item 2 -->
+                <div class="cart-item fade-in-up">
+                    <div class="cart-item-image">🖱️</div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-title">Mouse Inalámbrico</div>
+                        <div class="cart-item-description">Electrónica • En stock</div>
+                        <div class="cart-item-price">$29.99 x2</div>
+                    </div>
+                    <div class="cart-item-actions">
+                        <div class="quantity-controls">
+                            <button>−</button>
+                            <input type="number" value="2" min="1">
+                            <button>+</button>
+                        </div>
+                        <button class="remove-btn" title="Eliminar">✕</button>
+                    </div>
+                </div>
+
+                <!-- Cart Item 3 -->
+                <div class="cart-item fade-in-up">
+                    <div class="cart-item-image">⌨️</div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-title">Teclado Mecánico RGB</div>
+                        <div class="cart-item-description">Electrónica • En stock</div>
+                        <div class="cart-item-price">$89.99</div>
+                    </div>
+                    <div class="cart-item-actions">
+                        <div class="quantity-controls">
+                            <button>−</button>
+                            <input type="number" value="1" min="1">
+                            <button>+</button>
+                        </div>
+                        <button class="remove-btn" title="Eliminar">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="cart-summary">
+                <h2>Resumen</h2>
+
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>$1,449.96</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Envío</span>
+                    <span class="badge-success" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success); padding: 2px 8px; border-radius: 999px; font-size: var(--font-size-xs);">Gratis</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Impuestos (21%)</span>
+                    <span>$304.49</span>
+                </div>
+
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span>$1,754.45</span>
+                </div>
+
+                <button class="btn btn-primary checkout-btn">Ir al Checkout</button>
+                <a href="products.html" class="btn btn-outline continue-shopping">Continuar Comprando</a>
+
+                <!-- Promo Code -->
+                <div class="promo-section">
+                    <div class="promo-label">¿Tienes código de descuento?</div>
+                    <div class="promo-input">
+                        <input type="text" placeholder="Código...">
+                        <button class="btn btn-secondary" style="padding: var(--spacing-2) var(--spacing-4);">Aplicar</button>
+                    </div>
+                </div>
+
+                <!-- Security Badge -->
+                <div style="margin-top: var(--spacing-6); padding-top: var(--spacing-6); border-top: var(--border-width-1) solid var(--color-gray-200); text-align: center; font-size: var(--font-size-xs); color: var(--color-gray-600);">
+                    <div style="margin-bottom: var(--spacing-2);">🔒 Compra segura</div>
+                    <div>Pago con encriptación SSL</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: var(--color-gray-900); color: var(--color-gray-100); padding: var(--spacing-12) var(--spacing-4); margin-top: var(--spacing-16);">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-8); margin-bottom: var(--spacing-8);">
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Sobre Ourus</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Acerca de</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Blog</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Carreras</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Soporte</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Centro de Ayuda</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Contacto</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Estado</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Legal</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Privacidad</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Términos</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Cookies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Síguenos</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Facebook</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Twitter</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid var(--color-gray-700); padding-top: var(--spacing-6); text-align: center; color: var(--color-gray-400);">
+                <p>&copy; 2026 Ourus. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

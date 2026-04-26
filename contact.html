@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contacto - Ourus">
+    <title>Contacto - Ourus</title>
+    
+    <link rel="stylesheet" href="../src/styles/variables.css">
+    <link rel="stylesheet" href="../src/styles/global.css">
+    <link rel="stylesheet" href="../src/styles/components.css">
+    <link rel="stylesheet" href="../src/styles/responsive.css">
+    <link rel="stylesheet" href="../src/styles/animations.css">
+    
+    <style>
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-12);
+            padding: var(--spacing-12) var(--spacing-4);
+        }
+
+        .contact-form {
+            background: var(--color-white);
+            padding: var(--spacing-8);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-8);
+        }
+
+        .info-card {
+            background: var(--color-white);
+            padding: var(--spacing-6);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .info-icon {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .info-card h3 {
+            margin-bottom: var(--spacing-3);
+        }
+
+        .info-card p {
+            color: var(--color-gray-600);
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-6);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-2);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: var(--spacing-3) var(--spacing-4);
+            border: var(--border-width-1) solid var(--color-gray-300);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-base);
+            font-family: inherit;
+            transition: all var(--transition-base);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-6);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: var(--spacing-4);
+            background: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .btn-submit:hover {
+            background: var(--color-secondary);
+            transform: translateY(-2px);
+        }
+
+        .faq-section {
+            background: var(--color-gray-50);
+            padding: var(--spacing-8);
+            border-radius: var(--border-radius-lg);
+            margin-top: var(--spacing-12);
+        }
+
+        .faq-item {
+            background: var(--color-white);
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-4);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .faq-item:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .faq-answer {
+            display: none;
+            margin-top: var(--spacing-4);
+            color: var(--color-gray-700);
+            line-height: 1.6;
+        }
+
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+
+        .faq-toggle {
+            font-size: var(--font-size-lg);
+            transition: transform var(--transition-base);
+        }
+
+        .faq-item.open .faq-toggle {
+            transform: rotate(180deg);
+        }
+
+        @media (max-width: 768px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <nav class="container" style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-4); background: var(--color-white); box-shadow: var(--shadow-sm);">
+            <a href="index.html" style="text-decoration: none;">
+                <h1 style="margin: 0; font-size: var(--font-size-2xl); color: var(--color-primary);">🛍️ Ourus</h1>
+            </a>
+            <ul style="display: flex; list-style: none; gap: var(--spacing-8); margin: 0;">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="products.html">Productos</a></li>
+                <li><a href="cart.html">Carrito</a></li>
+                <li><a href="login.html" class="btn btn-primary btn-sm">Ingresar</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <h1 style="text-align: center; margin-bottom: var(--spacing-12);">Contáctanos</h1>
+
+        <div class="contact-container">
+            <!-- Contact Form -->
+            <div class="contact-form">
+                <h2>Envíanos un mensaje</h2>
+                <form id="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Nombre</label>
+                            <input type="text" id="name" name="name" placeholder="Tu nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="tu@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Asunto</label>
+                        <input type="text" id="subject" name="subject" placeholder="¿En qué podemos ayudarte?" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Mensaje</label>
+                        <textarea id="message" name="message" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Enviar Mensaje</button>
+                </form>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="contact-info">
+                <div class="info-card fade-in-up">
+                    <div class="info-icon">📍</div>
+                    <h3>Ubicación</h3>
+                    <p>Calle Principal 123<br>Madrid, 28001<br>España</p>
+                </div>
+
+                <div class="info-card fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="info-icon">📞</div>
+                    <h3>Teléfono</h3>
+                    <p>+34 91 123 4567<br>Lun-Vie: 9:00 - 18:00</p>
+                </div>
+
+                <div class="info-card fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="info-icon">✉️</div>
+                    <h3>Email</h3>
+                    <p>info@ourus.com<br>soporte@ourus.com</p>
+                </div>
+
+                <div class="info-card fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="info-icon">⏱️</div>
+                    <h3>Horarios</h3>
+                    <p>Lunes - Viernes: 9:00 - 18:00<br>Sábado: 10:00 - 14:00<br>Domingo: Cerrado</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2 style="margin-top: 0; margin-bottom: var(--spacing-6);">Preguntas Frecuentes</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>¿Cuál es el tiempo de envío?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Ofrecemos envío estándar de 3-5 días hábiles (gratis en compras mayores a $50) y envío express de 1-2 días hábiles por $9.99.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>¿Cuál es tu política de devoluciones?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Tenemos una política de devoluciones de 30 días sin preguntas. El producto debe estar en su empaque original y sin usar. El envío de devolución corre por nuestra cuenta.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>¿Cuáles son los métodos de pago disponibles?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Aceptamos tarjetas de crédito/débito, PayPal, transferencias bancarias y Apple Pay. Todos los pagos están encriptados con SSL 256-bit.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>¿Mi información personal está segura?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Sí, utilizamos los estándares de seguridad más altos. Todos tus datos están encriptados y nunca compartimos tu información personal con terceros.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>¿Cómo puedo rastrear mi pedido?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Una vez que tu pedido sea enviado, recibirás un email con un número de seguimiento. Puedes usarlo para rastrear tu paquete en tiempo real.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: var(--color-gray-900); color: var(--color-gray-100); padding: var(--spacing-12) var(--spacing-4); margin-top: var(--spacing-16);">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-8); margin-bottom: var(--spacing-8);">
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Sobre Ourus</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="about.html" style="color: var(--color-gray-100);">Acerca de</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Blog</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Carreras</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Soporte</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="contact.html" style="color: var(--color-gray-100);">Centro de Ayuda</a></li>
+                        <li><a href="contact.html" style="color: var(--color-gray-100);">Contacto</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Estado</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Legal</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Privacidad</a></li>
+                        <li><a href="terms.html" style="color: var(--color-gray-100);">Términos</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Cookies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--color-white); margin-bottom: var(--spacing-4);">Síguenos</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li><a href="#" style="color: var(--color-gray-100);">Facebook</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Twitter</a></li>
+                        <li><a href="#" style="color: var(--color-gray-100);">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid var(--color-gray-700); padding-top: var(--spacing-6); text-align: center; color: var(--color-gray-400);">
+                <p>&copy; 2026 Ourus. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ toggle
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('open');
+            });
+        });
+
+        // Contact form
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('¡Gracias por tu mensaje! Nos pondremos en contacto pronto.');
+            document.getElementById('contact-form').reset();
+        });
+    </script>
+</body>
+</html>
