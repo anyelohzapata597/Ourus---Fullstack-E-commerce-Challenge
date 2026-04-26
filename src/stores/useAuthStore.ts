@@ -15,6 +15,28 @@ interface AuthStore {
   checkAuth: () => void
 }
 
+const normalizeUser = (user: unknown): User | null => {
+  if (!user || typeof user !== 'object') return null
+
+  const raw = user as Partial<User>
+  const email = typeof raw.email === 'string' ? raw.email : ''
+  const name =
+    typeof raw.name === 'string' && raw.name.trim()
+      ? raw.name
+      : email
+        ? email.split('@')[0]
+        : 'Usuario'
+
+  return {
+    id: raw.id ? String(raw.id) : undefined,
+    name,
+    email,
+    phone: typeof raw.phone === 'string' ? raw.phone : '',
+    address: typeof raw.address === 'string' ? raw.address : '',
+    role: raw.role === 'admin' || raw.role === 'guest' ? raw.role : 'customer',
+  }
+}
+
 /**
  * useAuthStore - Zustand store para gestionar autenticación
  * Maneja login, register, logout y persiste el usuario en localStorage
@@ -113,7 +135,29 @@ export const useAuthStore = create<AuthStore>()(
       }),
       {
         name: 'auth-store',
-        version: 1,
+        version: 2,
+        migrate: (persistedState) => {
+          const state = persistedState as Partial<AuthStore> | undefined
+          const user = normalizeUser(state?.user)
+          return {
+            user,
+            isAuthenticated: Boolean(user),
+            isLoading: false,
+            error: null,
+          }
+        },
+        merge: (persistedState, currentState) => {
+          const state = persistedState as Partial<AuthStore> | undefined
+          const user = normalizeUser(state?.user)
+          return {
+            ...currentState,
+            ...state,
+            user,
+            isAuthenticated: Boolean(user),
+            isLoading: false,
+            error: null,
+          }
+        },
       }
     )
   )

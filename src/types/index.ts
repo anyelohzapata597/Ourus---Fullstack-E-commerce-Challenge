@@ -11,6 +11,7 @@ export interface Product {
   image: string;
   category: string;
   rating: Rating;
+  stock?: number;
 }
 
 /**

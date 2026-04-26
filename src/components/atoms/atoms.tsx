@@ -64,6 +64,8 @@ interface BadgeProps {
   children: React.ReactNode
   /** Clases CSS adicionales */
   className?: string
+  /** Estilos inline adicionales */
+  style?: React.CSSProperties
 }
 
 interface CardProps {
@@ -374,6 +376,7 @@ export const Badge: React.FC<BadgeProps> = ({
   size = 'base',
   children,
   className = '',
+  style,
 }) => {
   const variantStyles = {
     primary: { bg: 'var(--color-primary-light)', color: 'var(--color-primary)' },
@@ -398,6 +401,7 @@ export const Badge: React.FC<BadgeProps> = ({
         backgroundColor: variantStyles.bg,
         color: variantStyles.color,
         ...sizeStyle,
+        ...style,
       }}
     >
       {children}

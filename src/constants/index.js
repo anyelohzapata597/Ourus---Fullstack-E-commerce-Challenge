@@ -1,5 +1,5 @@
 /**
- * Constantes de ShopHub
+ * Constantes de Ourus
  */
 
 // Categorías de Productos
@@ -66,8 +66,8 @@ export const VALIDATION = {
   NAME_MIN_LENGTH: 2,
   NAME_MAX_LENGTH: 100,
   EMAIL_MAX_LENGTH: 100,
-  PHONE_PATTERN: /^[0-9\-\+\s\(\)]{10,}$/,
-  POSTAL_CODE_PATTERN: /^[0-9\s\-]{5,}$/
+  PHONE_PATTERN: /^[0-9+\s()-]{10,}$/,
+  POSTAL_CODE_PATTERN: /^[0-9\s-]{5,}$/
 };
 
 // Descuentos
@@ -99,11 +99,11 @@ export const TIMEOUTS = {
 
 // LocalStorage Keys
 export const STORAGE_KEYS = {
-  USER: 'shophub_user',
-  CART: 'shophub_cart',
-  FAVORITES: 'shophub_favorites',
-  THEME: 'shophub_theme',
-  PREFERENCES: 'shophub_preferences'
+  USER: 'ourus_user',
+  CART: 'ourus_cart',
+  FAVORITES: 'ourus_favorites',
+  THEME: 'ourus_theme',
+  PREFERENCES: 'ourus_preferences'
 };
 
 // Mensajes

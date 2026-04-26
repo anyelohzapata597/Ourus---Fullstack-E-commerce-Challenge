@@ -1,4 +1,4 @@
-# Accessibility Guide - ShopHub
+# Accessibility Guide - Ourus
 
 ## 🎯 Objetivo
 Cumplir con WCAG 2.1 Level AA estándares de accesibilidad web

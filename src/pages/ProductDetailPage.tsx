@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useCartStore, useAppStore } from '@stores/index'
 import { MOCK_PRODUCTS } from '@mockdata/products.ts'
 import apiService from '@services/index'
@@ -14,7 +14,6 @@ import type { Product } from '../types'
  */
 const ProductDetailPage: FC = () => {
   const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
   const [product, setProduct] = useState<Product | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [isFavorite, setIsFavorite] = useState(false)
@@ -51,7 +50,14 @@ const ProductDetailPage: FC = () => {
 
   const handleAddToCart = () => {
     if (product) {
-      addItem(product, quantity)
+      addItem({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+        quantity,
+        subtotal: product.price * quantity,
+      })
       showNotification(`✅ ${quantity}x ${product.title} agregado al carrito`, 'success')
       setQuantity(1)
     }
@@ -331,11 +337,6 @@ const ProductDetailPage: FC = () => {
                 Cantidad:
               </label>
               <input
-                type="number"
-                min="1"
-                max="10"
-                value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                 type="number"
                 min="1"
                 max="10"

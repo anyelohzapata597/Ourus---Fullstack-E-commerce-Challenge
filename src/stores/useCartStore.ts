@@ -11,6 +11,34 @@ interface CartStore {
   getSubtotal: () => number
   getTotal: () => number
   getItemCount: () => number
+  getTotalPrice: () => number
+  getTotalItems: () => number
+}
+
+const normalizeCartItems = (items: unknown): CartItem[] => {
+  if (!Array.isArray(items)) return []
+
+  return items
+    .map((item) => {
+      if (!item || typeof item !== 'object') return null
+
+      const raw = item as Partial<CartItem>
+      const id = Number(raw.id)
+      const price = Number(raw.price)
+      const quantity = Math.max(1, Number(raw.quantity) || 1)
+
+      if (!Number.isFinite(id) || !Number.isFinite(price)) return null
+
+      return {
+        id,
+        title: String(raw.title || 'Producto'),
+        price,
+        image: String(raw.image || ''),
+        quantity,
+        subtotal: price * quantity,
+      }
+    })
+    .filter((item): item is CartItem => item !== null)
 }
 
 /**
@@ -67,7 +95,7 @@ export const useCartStore = create<CartStore>()(
         },
 
         getSubtotal: () => {
-          return get().items.reduce((sum, item) => sum + item.subtotal, 0)
+          return normalizeCartItems(get().items).reduce((sum, item) => sum + item.subtotal, 0)
         },
 
         getTotal: () => {
@@ -77,12 +105,30 @@ export const useCartStore = create<CartStore>()(
         },
 
         getItemCount: () => {
-          return get().items.reduce((count, item) => count + item.quantity, 0)
+          return normalizeCartItems(get().items).reduce((count, item) => count + item.quantity, 0)
         },
+
+        getTotalPrice: () => get().getSubtotal(),
+
+        getTotalItems: () => get().getItemCount(),
       }),
       {
         name: 'cart-store',
-        version: 1,
+        version: 2,
+        migrate: (persistedState) => {
+          const state = persistedState as Partial<CartStore> | undefined
+          return {
+            items: normalizeCartItems(state?.items),
+          }
+        },
+        merge: (persistedState, currentState) => {
+          const state = persistedState as Partial<CartStore> | undefined
+          return {
+            ...currentState,
+            ...state,
+            items: normalizeCartItems(state?.items),
+          }
+        },
       }
     )
   )

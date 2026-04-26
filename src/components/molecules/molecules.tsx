@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 import {
   Button,
-  Input,
   Rating,
   Badge,
   Card,
-  Select,
-  Textarea,
 } from '@components/atoms/atoms'
+import { useCartStore } from '@stores/index'
+import type { CartItem as CartLineItem } from '../../types'
 
 // ======================== PRODUCT CARD ========================
 
@@ -50,12 +49,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   originalPrice,
   rating,
   reviewCount,
-  inStock = true,
   discount,
   onCardClick,
   onAddToCart,
   className = '',
 }) => {
+  const { addItem } = useCartStore()
+
+  const handleAddToCart = () => {
+    const item: CartLineItem = {
+      id: Number(id),
+      title,
+      price,
+      image,
+      quantity: 1,
+      subtotal: price,
+    }
+
+    addItem(item)
+    onAddToCart?.()
+  }
+
   return (
     <Card isClickable onClick={onCardClick} className={className}>
       <div style={{ position: 'relative', overflow: 'hidden', height: '200px' }}>
@@ -87,22 +101,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           >
             -{discount}%
           </Badge>
-        )}
-        {!inStock && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--color-white)',
-              fontWeight: 'var(--font-weight-bold)',
-            }}
-          >
-            Out of Stock
-          </div>
         )}
       </div>
 
@@ -151,13 +149,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           variant="primary"
           size="sm"
           isBlock
-          disabled={!inStock}
           onClick={(e) => {
             e.stopPropagation()
-            onAddToCart?.()
+            handleAddToCart()
           }}
         >
-          {inStock ? 'Add to Cart' : 'Out of Stock'}
+          Agregar al carrito
         </Button>
       </div>
     </Card>
@@ -202,6 +199,7 @@ export const CartItem: React.FC<CartItemProps> = ({
   return (
     <div
       className={className}
+      data-cart-item-id={id}
       style={{
         display: 'flex',
         gap: 'var(--spacing-4)',
@@ -325,6 +323,8 @@ export interface SearchBarProps {
   showButton?: boolean
   /** Additional className */
   className?: string
+  /** Inline styles */
+  style?: React.CSSProperties
 }
 
 /**
@@ -338,6 +338,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   showButton = true,
   className = '',
+  style,
 }) => {
   const [localValue, setLocalValue] = useState(value)
 
@@ -348,6 +349,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         display: 'flex',
         gap: 'var(--spacing-2)',
         alignItems: 'center',
+        ...style,
       }}
     >
       <input

@@ -1,7 +1,7 @@
-# Performance Optimization Guide - ShopHub
+# Performance Optimization Guide - Ourus
 
 ## 📊 Objetivo
-Asegurar que ShopHub cargue rápido y tenga una experiencia de usuario fluida con métricas de Lighthouse 90+
+Asegurar que Ourus cargue rápido y tenga una experiencia de usuario fluida con métricas de Lighthouse 90+
 
 ---
 
@@ -142,7 +142,7 @@ module.exports = {
 ### Service Worker (Futuro)
 ```javascript
 // Para cachear assets estáticos
-const CACHE_NAME = 'shophub-v1';
+const CACHE_NAME = 'Ourus-v1';
 const urlsToCache = [
   '/',
   '/index.html',

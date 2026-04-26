@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useProducts } from '@hooks/index'
 import { ProductCard } from '@components/molecules/molecules'
-import type { Product } from '@types/index'
+import type { Product } from '../types'
 
 /**
  * HomePage - Landing page con hero, categorías y productos destacados
@@ -64,13 +64,12 @@ const HomePage: FC = () => {
   }, [products])
 
   return (
-    <div style={{ minHeight: '100vh' }}>
+    <div style={{ minHeight: '100vh', background: 'transparent' }}>
       {/* ========== HERO SECTION (P1: Opción A - Imagen + Título + CTA) ========== */}
       <section
         style={{
-          background: `linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%), 
+          background: `linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(30, 64, 175, 0.78) 52%, rgba(88, 28, 135, 0.74) 100%), 
                         url('https://images.unsplash.com/photo-1557821552-17105176677c?w=1400&q=80') center/cover`,
-          backgroundBlendMode: 'overlay',
           color: 'var(--color-white)',
           padding: 'var(--spacing-20) var(--spacing-4)',
           textAlign: 'center' as const,
@@ -86,7 +85,7 @@ const HomePage: FC = () => {
               animation: 'fadeInUp 0.8s ease-out 0.2s backwards',
             }}
           >
-            Bienvenido a ShopHub
+            Bienvenido a Ourus
           </h1>
 
           <p
@@ -136,7 +135,9 @@ const HomePage: FC = () => {
       <section
         style={{
           padding: `var(--spacing-16) var(--spacing-4)`,
-          backgroundColor: 'var(--color-gray-50)',
+          backgroundColor: 'rgba(15, 23, 42, 0.72)',
+          borderTop: '1px solid rgba(148, 163, 184, 0.14)',
+          borderBottom: '1px solid rgba(148, 163, 184, 0.14)',
         }}
       >
         <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
@@ -146,7 +147,7 @@ const HomePage: FC = () => {
               fontWeight: 'var(--font-weight-bold)',
               marginBottom: 'var(--spacing-8)',
               textAlign: 'center' as const,
-              color: 'var(--color-gray-900)',
+              color: '#f8fafc',
             }}
           >
             Categorías Destacadas
@@ -173,7 +174,8 @@ const HomePage: FC = () => {
                   textDecoration: 'none',
                   transition: 'all 0.3s ease',
                   cursor: 'pointer',
-                  border: `2px solid ${category.textColor}40`,
+                  border: `1px solid ${category.textColor}40`,
+                  boxShadow: '0 18px 38px rgba(0, 0, 0, 0.22)',
                 } as React.CSSProperties}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-4px)'
@@ -209,7 +211,7 @@ const HomePage: FC = () => {
       <section
         style={{
           padding: `var(--spacing-16) var(--spacing-4)`,
-          backgroundColor: 'var(--color-white)',
+          backgroundColor: 'rgba(11, 17, 32, 0.82)',
         }}
       >
         <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
@@ -219,7 +221,7 @@ const HomePage: FC = () => {
               fontWeight: 'var(--font-weight-bold)',
               marginBottom: 'var(--spacing-8)',
               textAlign: 'center' as const,
-              color: 'var(--color-gray-900)',
+              color: '#f8fafc',
             }}
           >
             Productos Destacados
@@ -230,7 +232,7 @@ const HomePage: FC = () => {
               style={{
                 textAlign: 'center' as const,
                 padding: 'var(--spacing-16)',
-                color: 'var(--color-gray-500)',
+                color: '#94a3b8',
               }}
             >
               <p>Cargando productos...</p>
@@ -266,6 +268,7 @@ const HomePage: FC = () => {
                   onCardClick={() => {
                     window.location.href = `/products/${product.id}`
                   }}
+                  onAddToCart={() => undefined}
                 />
               ))}
             </div>

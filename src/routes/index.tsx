@@ -1,5 +1,6 @@
-import { RouteObject } from 'react-router-dom'
-import { lazy, Suspense, FC } from 'react'
+import { Navigate, RouteObject, useLocation } from 'react-router-dom'
+import { lazy, Suspense, FC, ReactNode } from 'react'
+import { useAuthStore } from '@stores/index'
 
 // ========== PAGES - Lazy Loading para code splitting ========== 
 const HomePage = lazy(() => import('@pages/HomePage'))
@@ -16,6 +17,17 @@ const NotFoundPage = lazy(() => import('@pages/NotFoundPage'))
 
 // ========== LAYOUTS
 const MainLayout = lazy(() => import('@components/layouts/MainLayout'))
+
+const RequireAuth: FC<{ children: ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuthStore()
+  const location = useLocation()
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/register" replace state={{ from: location }} />
+  }
+
+  return <>{children}</>
+}
 
 /**
  * PageLoader - Loading fallback para Suspense
@@ -100,7 +112,11 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'checkout',
-        element: withSuspense(CheckoutPage),
+        element: (
+          <RequireAuth>
+            {withSuspense(CheckoutPage)}
+          </RequireAuth>
+        ),
       },
       {
         path: 'about',

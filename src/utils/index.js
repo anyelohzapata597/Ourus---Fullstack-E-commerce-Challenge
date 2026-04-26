@@ -1,5 +1,5 @@
 /**
- * Utilidades comunes para ShopHub
+ * Utilidades comunes para Ourus
  */
 
 /**

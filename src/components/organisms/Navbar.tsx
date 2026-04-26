@@ -1,10 +1,7 @@
 import { useState, FC } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useCartStore, useAuthStore } from '@stores/index'
 
-/**
- * Navbar - Navegación principal con autenticación y carrito
- */
 const Navbar: FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
@@ -13,8 +10,8 @@ const Navbar: FC = () => {
   const { getItemCount } = useCartStore()
   const { isAuthenticated, user, logout } = useAuthStore()
   const itemCount = getItemCount()
-
-  const isActive = (path: string) => pathname === path
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Usuario'
+  const displayEmail = user?.email || 'Sin correo registrado'
 
   const navLinks = [
     { path: '/', label: 'Inicio' },
@@ -22,201 +19,159 @@ const Navbar: FC = () => {
     { path: '/about', label: 'Acerca de' },
   ]
 
+  const isActive = (path: string) => pathname === path
+
+  const closeMenus = () => {
+    setIsMobileMenuOpen(false)
+    setIsUserDropdownOpen(false)
+  }
+
   const handleLogout = () => {
     logout()
-    setIsUserDropdownOpen(false)
+    closeMenus()
     navigate('/')
   }
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50 animate-fade-in">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="h-16 flex items-center justify-between">
-          {/* Logo */}
-          <Link
-            to="/"
-            className="text-2xl font-bold text-primary flex items-center gap-2 hover-scale"
-          >
-            🛍️ ShopHub
+    <nav className="site-navbar" aria-label="Navegacion principal">
+      <div className="site-navbar__inner">
+        <div className="site-navbar__bar">
+          <Link to="/" className="site-navbar__brand" onClick={closeMenus}>
+            <span className="site-navbar__brand-mark" aria-hidden="true">O</span>
+            <span>Ourus</span>
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex gap-8 items-center">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`font-semibold transition-colors ${
-                  isActive(link.path)
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-gray-700 hover:text-primary'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+          <div className="site-navbar__desktop">
+            <div className="site-navbar__links">
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `site-navbar__link ${isActive ? 'site-navbar__link--active' : ''}`
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </div>
 
-            {/* Cart Link with Badge */}
-            <Link
-              to="/cart"
-              className={`relative font-semibold transition-colors ${
-                isActive('/cart')
-                  ? 'text-primary'
-                  : 'text-gray-700 hover:text-primary'
-              }`}
+            <button
+              type="button"
+              onClick={() => {
+                closeMenus()
+                navigate('/cart')
+              }}
+              className={`site-navbar__cart ${isActive('/cart') ? 'site-navbar__cart--active' : ''}`}
             >
-              🛒 Carrito
+              <span aria-hidden="true">🛒</span>
+              <span>Carrito</span>
               {itemCount > 0 && (
-                <span className="absolute -top-2 -right-4 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="site-navbar__cart-badge" aria-label={`${itemCount} productos en el carrito`}>
                   {itemCount}
                 </span>
               )}
-            </Link>
+            </button>
 
-            {/* Auth Section */}
-            {isAuthenticated && user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                  className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <span>👤 {user.name}</span>
-                  <span className={`transition-transform ${isUserDropdownOpen ? 'rotate-180' : ''}`}>
-                    ▼
-                  </span>
-                </button>
+            <div className="site-navbar__auth">
+              {isAuthenticated && user ? (
+                <div className="site-navbar__user">
+                  <button
+                    type="button"
+                    onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                    className="site-navbar__user-button"
+                    aria-expanded={isUserDropdownOpen}
+                  >
+                    <span className="site-navbar__avatar" aria-hidden="true">
+                      {displayName.charAt(0).toUpperCase()}
+                    </span>
+                    <span>{displayName}</span>
+                    <span className={`site-navbar__chevron ${isUserDropdownOpen ? 'site-navbar__chevron--open' : ''}`}>
+                      ▾
+                    </span>
+                  </button>
 
-                {/* Dropdown Menu */}
-                {isUserDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 animate-fade-in">
-                    <div className="px-4 py-2 border-b border-gray-200">
-                      <p className="text-sm text-gray-700 font-semibold">{user.email}</p>
-                      <p className="text-xs text-gray-500">{user.role}</p>
+                  {isUserDropdownOpen && (
+                    <div className="site-navbar__dropdown">
+                      <div className="site-navbar__dropdown-header">
+                        <p>{displayEmail}</p>
+                        <span>{user.role || 'customer'}</span>
+                      </div>
+                      <Link to="/" onClick={() => setIsUserDropdownOpen(false)}>Mi perfil</Link>
+                      <Link to="/" onClick={() => setIsUserDropdownOpen(false)}>Mis ordenes</Link>
+                      <Link to="/" onClick={() => setIsUserDropdownOpen(false)}>Configuracion</Link>
+                      <button type="button" onClick={handleLogout}>Cerrar sesion</button>
                     </div>
-                    <Link
-                      to="/"
-                      onClick={() => setIsUserDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      📊 Mi Perfil
-                    </Link>
-                    <Link
-                      to="/"
-                      onClick={() => setIsUserDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      📦 Mis Órdenes
-                    </Link>
-                    <Link
-                      to="/"
-                      onClick={() => setIsUserDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      ⚙️ Configuración
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-semibold border-t border-gray-200 mt-2"
-                    >
-                      🚪 Cerrar Sesión
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <Link
-                  to="/auth/login"
-                  className="text-primary font-semibold hover:text-blue-700 transition-colors"
-                >
-                  Iniciar Sesión
-                </Link>
-                <Link
-                  to="/auth/register"
-                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Registrarse
-                </Link>
-              </div>
-            )}
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Link to="/auth/login" className="site-navbar__login">
+                    Iniciar sesion
+                  </Link>
+                  <Link to="/auth/register" className="site-navbar__register">
+                    Registrarse
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
+            type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-2xl text-primary hover-scale"
-            aria-label="Toggle mobile menu"
+            className="site-navbar__menu-button"
+            aria-label="Abrir menu"
             aria-expanded={isMobileMenuOpen}
           >
-            ☰
+            <span />
+            <span />
+            <span />
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden pb-4 animate-slide-in-left">
+          <div className="site-navbar__mobile">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`block py-2 px-4 ${
-                  isActive(link.path)
-                    ? 'text-primary font-bold border-l-4 border-primary bg-blue-50'
-                    : 'text-gray-700'
-                }`}
+                onClick={closeMenus}
+                className={isActive(link.path) ? 'site-navbar__mobile-link site-navbar__mobile-link--active' : 'site-navbar__mobile-link'}
               >
                 {link.label}
               </Link>
             ))}
 
-            {/* Mobile Cart Link */}
-            <Link
-              to="/cart"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={`block py-2 px-4 relative ${
-                isActive('/cart')
-                  ? 'text-primary font-bold border-l-4 border-primary bg-blue-50'
-                  : 'text-gray-700'
-              }`}
+            <button
+              type="button"
+              onClick={() => {
+                closeMenus()
+                navigate('/cart')
+              }}
+              className={isActive('/cart') ? 'site-navbar__mobile-link site-navbar__mobile-link--active' : 'site-navbar__mobile-link'}
             >
-              🛒 Carrito
-              {itemCount > 0 && (
-                <span className="ml-2 inline-block bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 text-center">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
+              Carrito
+              {itemCount > 0 && <span className="site-navbar__mobile-badge">{itemCount}</span>}
+            </button>
 
-            {/* Mobile Auth Section */}
-            <div className="border-t border-gray-200 mt-2 pt-2">
+            <div className="site-navbar__mobile-auth">
               {isAuthenticated && user ? (
                 <>
-                  <div className="px-4 py-2 bg-blue-50">
-                    <p className="text-sm font-semibold text-gray-700">{user.name}</p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
+                  <div className="site-navbar__mobile-user">
+                    <strong>{displayName}</strong>
+                    <span>{displayEmail}</span>
                   </div>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left py-2 px-4 text-red-600 font-semibold hover:bg-red-50 transition-colors"
-                  >
-                    🚪 Cerrar Sesión
+                  <button type="button" onClick={handleLogout} className="site-navbar__mobile-logout">
+                    Cerrar sesion
                   </button>
                 </>
               ) : (
                 <>
-                  <Link
-                    to="/auth/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block py-2 px-4 text-primary font-semibold hover:bg-blue-50"
-                  >
-                    Iniciar Sesión
+                  <Link to="/auth/login" onClick={closeMenus} className="site-navbar__mobile-link">
+                    Iniciar sesion
                   </Link>
-                  <Link
-                    to="/auth/register"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block py-2 px-4 text-white bg-primary font-semibold hover:bg-blue-700 rounded-lg mt-2"
-                  >
+                  <Link to="/auth/register" onClick={closeMenus} className="site-navbar__mobile-register">
                     Registrarse
                   </Link>
                 </>

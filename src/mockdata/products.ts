@@ -4,7 +4,7 @@
  * Usado en FASE 1-2, migrado a Firestore en FASE 3
  */
 
-import { Product } from '../types/product';
+import type { Product } from '../types';
 
 export const MOCK_PRODUCTS: Product[] = [
   // ===== ELECTRONICS (12) =====
@@ -448,4 +448,4 @@ export const MOCK_PRODUCTS: Product[] = [
   },
 ];
 
-export default mockProducts;
+export default MOCK_PRODUCTS;

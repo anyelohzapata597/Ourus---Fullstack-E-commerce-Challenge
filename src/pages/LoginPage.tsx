@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@stores/index'
 import { useNotification } from '@components/NotificationProvider'
 
@@ -14,8 +14,13 @@ interface LoginForm {
  */
 const LoginPage: FC = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { addNotification } = useNotification()
   const { login, isAuthenticated, error: authError, setError } = useAuthStore()
+  const redirectTo = (() => {
+    const state = location.state as { from?: { pathname?: string; search?: string } } | null
+    return `${state?.from?.pathname || '/'}${state?.from?.search || ''}`
+  })()
 
   const [formData, setFormData] = useState<LoginForm>({
     email: '',
@@ -28,9 +33,9 @@ const LoginPage: FC = () => {
   // Redirect si ya está autenticado
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/')
+      navigate(redirectTo, { replace: true })
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, navigate, redirectTo])
 
   const validateForm = (): boolean => {
     const newErrors: Partial<LoginForm> = {}
@@ -80,7 +85,7 @@ const LoginPage: FC = () => {
       }
 
       addNotification(`¡Bienvenido ${mockUser.name}!`, 'success', 3000)
-      navigate('/')
+      navigate(redirectTo, { replace: true })
     } catch (err) {
       addNotification('Error al iniciar sesión. Verifica tus credenciales.', 'error', 3000)
     } finally {

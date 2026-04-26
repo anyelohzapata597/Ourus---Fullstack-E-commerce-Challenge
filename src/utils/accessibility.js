@@ -2,6 +2,7 @@
  * Accessibility Utilities
  * Herramientas para mejorar accesibilidad
  */
+import React from 'react';
 
 /**
  * Generar ID único para asociar labels con inputs
@@ -32,8 +33,8 @@ export const srOnlyClass = 'sr-only absolute w-1 h-1 p-0 -m-1 overflow-hidden cl
 /**
  * Component para texto invisible para screen readers
  */
-export const ScreenReaderOnly = ({ children, as: Component = 'span' }) => {
-  return <Component className={srOnlyClass}>{children}</Component>;
+export const ScreenReaderOnly = ({ children, as = 'span' }) => {
+  return React.createElement(as, { className: srOnlyClass }, children);
 };
 
 /**
@@ -42,7 +43,6 @@ export const ScreenReaderOnly = ({ children, as: Component = 'span' }) => {
 export const createAccessibleButton = (options) => {
   const {
     onClick,
-    icon,
     label,
     ariaLabel,
     disabled = false,
@@ -102,7 +102,6 @@ export const createAccessibleSelect = (options) => {
     id,
     value,
     onChange,
-    options: selectOptions,
     required = false,
     ariaLabel = null,
   } = options;

@@ -8,6 +8,7 @@ import type { Product, SearchFilters } from '../types'
 import { MOCK_PRODUCTS } from '../mockdata/products.ts'
 
 const API_BASE_URL = 'https://fakestoreapi.com'
+const CACHE_VERSION = 'v3'
 const CACHE_TTL = 60 * 60 * 1000 // 1 hora en millisegundos
 const MAX_RETRIES = 3
 const RETRY_DELAY = 1000 // 1 segundo
@@ -56,6 +57,10 @@ export class APIError extends Error {
 class CacheManager {
   private cache = new Map<string, CacheEntry<any>>()
 
+  private storageKey(key: string): string {
+    return `api-cache-${CACHE_VERSION}-${key}`
+  }
+
   set<T>(key: string, data: T): void {
     this.cache.set(key, {
       data,
@@ -63,7 +68,7 @@ class CacheManager {
     })
     // También guardar en localStorage para persistencia
     try {
-      localStorage.setItem(`api-cache-${key}`, JSON.stringify({
+      localStorage.setItem(this.storageKey(key), JSON.stringify({
         data,
         timestamp: Date.now(),
       }))
@@ -81,7 +86,7 @@ class CacheManager {
 
     // Si no, intenta localStorage
     try {
-      const stored = localStorage.getItem(`api-cache-${key}`)
+      const stored = localStorage.getItem(this.storageKey(key))
       if (stored) {
         const entry = JSON.parse(stored)
         if (Date.now() - entry.timestamp < CACHE_TTL) {
@@ -99,7 +104,7 @@ class CacheManager {
   clear(key: string): void {
     this.cache.delete(key)
     try {
-      localStorage.removeItem(`api-cache-${key}`)
+      localStorage.removeItem(this.storageKey(key))
     } catch (e) {
       console.warn('Failed to clear cache from localStorage:', e)
     }
@@ -155,7 +160,7 @@ async function fetchWithRetry(
  */
 
 function transformFakeStoreProduct(p: FakeStoreProduct): Product {
-  return {
+  return normalizeProduct({
     id: p.id,
     title: p.title,
     price: p.price,
@@ -163,7 +168,28 @@ function transformFakeStoreProduct(p: FakeStoreProduct): Product {
     image: p.image,
     category: p.category,
     rating: p.rating,
+  })
+}
+
+function normalizeProduct(product: Product): Product {
+  return {
+    ...product,
+    id: Number(product.id),
+    title: product.title || 'Producto',
+    price: Number(product.price) || 0,
+    description: product.description || '',
+    image: product.image || '',
+    category: product.category || 'general',
+    rating:
+      typeof product.rating === 'object'
+        ? product.rating
+        : { rate: Number(product.rating) || 0, count: 0 },
+    stock: Math.max(1, Number(product.stock) || 10),
   }
+}
+
+function normalizeProducts(products: Product[]): Product[] {
+  return products.map(normalizeProduct)
 }
 
 /**
@@ -182,7 +208,9 @@ export const apiService = {
       const cached = cacheManager.get<Product[]>(cacheKey)
       if (cached) {
         console.log('✅ Products loaded from cache')
-        return cached
+        const products = normalizeProducts(cached)
+        cacheManager.set(cacheKey, products)
+        return products
       }
 
       // 2. Intentar cargar de FakeStore API con retry
@@ -201,8 +229,9 @@ export const apiService = {
     } catch (error) {
       // 3. Fallback a mock data
       console.warn('⚠️ Using mock data as fallback:', error)
-      cacheManager.set(cacheKey, MOCK_PRODUCTS)
-      return MOCK_PRODUCTS
+      const products = normalizeProducts(MOCK_PRODUCTS)
+      cacheManager.set(cacheKey, products)
+      return products
     }
   },
 
@@ -217,7 +246,7 @@ export const apiService = {
       const cached = cacheManager.get<Product | null>(cacheKey)
       if (cached !== undefined) {
         if (cached) console.log(`✅ Product ${id} loaded from cache`)
-        return cached
+        return cached ? normalizeProduct(cached) : cached
       }
 
       // 2. Intentar cargar de FakeStore API
@@ -242,8 +271,9 @@ export const apiService = {
       // 3. Fallback a mock data
       console.warn(`⚠️ Using mock data for product ${id}:`, error)
       const mockProduct = MOCK_PRODUCTS.find(p => p.id === id) || null
-      cacheManager.set(cacheKey, mockProduct)
-      return mockProduct
+      const product = mockProduct ? normalizeProduct(mockProduct) : null
+      cacheManager.set(cacheKey, product)
+      return product
     }
   },
 
@@ -293,7 +323,9 @@ export const apiService = {
       const cached = cacheManager.get<Product[]>(cacheKey)
       if (cached) {
         console.log(`✅ Products in category '${category}' loaded from cache`)
-        return cached
+        const products = normalizeProducts(cached)
+        cacheManager.set(cacheKey, products)
+        return products
       }
 
       // 2. Intentar cargar de FakeStore API
@@ -314,7 +346,7 @@ export const apiService = {
     } catch (error) {
       // 3. Fallback: filtrar de mock data
       console.warn(`⚠️ Using mock data for category '${category}':`, error)
-      const mockProducts = MOCK_PRODUCTS.filter(p => p.category === category)
+      const mockProducts = normalizeProducts(MOCK_PRODUCTS.filter(p => p.category === category))
       cacheManager.set(cacheKey, mockProducts)
       return mockProducts
     }
@@ -355,8 +387,9 @@ export const apiService = {
       }
 
       // Filtro de rating mínimo
-      if (filters.minRating) {
-        filtered = filtered.filter(p => p.rating.rate >= filters.minRating)
+      if (filters.minRating !== undefined) {
+        const minRating = filters.minRating
+        filtered = filtered.filter(p => p.rating.rate >= minRating)
       }
 
       // Ordenamiento

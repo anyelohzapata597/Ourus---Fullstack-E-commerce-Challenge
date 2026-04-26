@@ -15,7 +15,7 @@ const Footer: FC = () => {
           {/* Company Info */}
           <div>
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-              🛍️ ShopHub
+              🛍️ Ourus
             </h3>
             <p className="text-gray-400 text-sm mb-4">
               Tu tienda online de confianza con productos de calidad y envíos rápidos.
@@ -80,8 +80,8 @@ const Footer: FC = () => {
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@shophub.com" className="text-gray-400 hover:text-white transition-colors">
-                  support@shophub.com
+                <a href="mailto:support@Ourus.com" className="text-gray-400 hover:text-white transition-colors">
+                  support@Ourus.com
                 </a>
               </li>
             </ul>
@@ -120,7 +120,7 @@ const Footer: FC = () => {
         {/* Copyright */}
         <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © {currentYear} ShopHub. Todos los derechos reservados.
+            © {currentYear} Ourus. Todos los derechos reservados.
           </p>
           <p className="text-gray-400 text-sm">
             Desarrollado con ❤️ para ti

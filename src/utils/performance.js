@@ -233,7 +233,7 @@ export const measureWebVitals = (onMetric) => {
       });
     });
     observer.observe({ entryTypes: ['largest-contentful-paint'] });
-  } catch (error) {
+  } catch {
     console.warn('LCP measurement not supported');
   }
 
@@ -253,7 +253,7 @@ export const measureWebVitals = (onMetric) => {
       });
     });
     observer.observe({ entryTypes: ['layout-shift'] });
-  } catch (error) {
+  } catch {
     console.warn('CLS measurement not supported');
   }
 
@@ -269,7 +269,7 @@ export const measureWebVitals = (onMetric) => {
       });
     });
     observer.observe({ entryTypes: ['first-input'] });
-  } catch (error) {
+  } catch {
     console.warn('FID measurement not supported');
   }
 };

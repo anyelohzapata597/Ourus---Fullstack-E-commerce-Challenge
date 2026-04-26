@@ -22,13 +22,22 @@ body {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-normal);
   line-height: 1.6;
-  color: var(--color-gray-900);
-  background-color: var(--color-white);
+  color: #e5edf7;
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 34rem),
+    radial-gradient(circle at top right, rgba(139, 92, 246, 0.16), transparent 30rem),
+    linear-gradient(135deg, #0b1120 0%, #111827 46%, #172033 100%);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #1f2937;
-  background-color: #ffffff;
-  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+main {
+  background: transparent;
 }
 
 /* Tipografía base con transiciones suaves */

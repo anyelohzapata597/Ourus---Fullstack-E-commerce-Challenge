@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { Product } from '@types/index'
+import type { Product } from '../types'
 import { useProducts, usePagination } from '@hooks/index'
 import { ProductCard } from '@components/molecules/molecules'
 
@@ -12,6 +12,9 @@ interface FiltersState {
   ratingMin: number
   inStock: boolean
 }
+
+const isProductAvailable = (product: Product): boolean =>
+  product.stock === undefined || product.stock > 0
 
 /**
  * ProductsPage - Listado de productos con sidebar filtros
@@ -89,7 +92,7 @@ const ProductsPage: FC = () => {
 
     // Filtro de stock
     if (filters.inStock) {
-      filtered = filtered.filter(p => p.stock !== undefined && p.stock > 0)
+      filtered = filtered.filter(isProductAvailable)
     }
 
     setFilteredProducts(filtered)
@@ -561,7 +564,7 @@ const ProductsPage: FC = () => {
                         : 0
                     }
                     discount={20}
-                    inStock={product.stock !== undefined && product.stock > 0}
+                    inStock={isProductAvailable(product)}
                   />
                 ))}
               </div>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { ProductCard, CartItem, SearchBar, PriceFilter, RatingFilter, CategorySelector } from '@components/molecules/molecules'
-import { Button, Card, Badge, Input } from '@components/atoms/atoms'
+import React from 'react'
+import { ProductCard, SearchBar, PriceFilter, RatingFilter } from '@components/molecules/molecules'
+import { Button, Card } from '@components/atoms/atoms'
 
 // ======================== PRODUCT GRID ========================
 

@@ -1,8 +1,50 @@
-import { FC, useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useCartStore, useAppStore } from '@stores/index'
+import { FC, useMemo, useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useCartStore, useAppStore, useAuthStore } from '@stores/index'
 import { MOCK_PRODUCTS } from '@mockdata/products.ts'
-import type { Product } from '../types'
+import type { CartItem, Product } from '../types'
+
+const normalizeCartItemsForDisplay = (items: CartItem[]): CartItem[] =>
+  items
+    .map((item) => {
+      const id = Number(item.id)
+      const price = Number(item.price)
+      const quantity = Math.max(1, Number(item.quantity) || 1)
+
+      if (!Number.isFinite(id) || !Number.isFinite(price)) return null
+
+      return {
+        id,
+        title: String(item.title || 'Producto'),
+        price,
+        image: String(item.image || ''),
+        quantity,
+        subtotal: price * quantity,
+      }
+    })
+    .filter((item): item is CartItem => item !== null)
+
+const getProductPresentation = (product: Product) => {
+  const title = product.title.toLowerCase()
+
+  if (title.includes('macbook') || title.includes('laptop')) {
+    return { label: 'Laptop profesional', visual: 'LAPTOP', accent: '#14b8a6' }
+  }
+
+  if (title.includes('ipad') || title.includes('tablet')) {
+    return { label: 'Tablet', visual: 'TABLET', accent: '#8b5cf6' }
+  }
+
+  if (title.includes('airpods') || title.includes('sony') || title.includes('audio')) {
+    return { label: 'Audio premium', visual: 'AUDIO', accent: '#f59e0b' }
+  }
+
+  if (title.includes('iphone') || title.includes('galaxy') || title.includes('phone')) {
+    return { label: 'Smartphone', visual: 'PHONE', accent: '#3b82f6' }
+  }
+
+  return { label: product.category || 'Producto', visual: 'ITEM', accent: '#64748b' }
+}
 
 /**
  * CartPage - Carrito de compras con Zustand store
@@ -12,10 +54,13 @@ import type { Product } from '../types'
  * Resumen: Subtotal + Impuestos (8%) + Total
  */
 const CartPage: FC = () => {
+  const navigate = useNavigate()
   const { items, removeItem, updateQuantity, clearCart, getTotalPrice, getTotalItems } =
     useCartStore()
+  const { isAuthenticated } = useAuthStore()
   const { showNotification } = useAppStore()
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([])
+  const cartItems = useMemo(() => normalizeCartItemsForDisplay(items), [items])
 
   // Load recommended products
   useEffect(() => {
@@ -48,8 +93,19 @@ const CartPage: FC = () => {
     }
   }
 
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      navigate('/auth/register', {
+        state: { from: { pathname: '/checkout' } },
+      })
+      return
+    }
+
+    navigate('/checkout')
+  }
+
   // Empty cart state
-  if (items.length === 0) {
+  if (cartItems.length === 0) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -124,82 +180,132 @@ const CartPage: FC = () => {
               gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
               gap: '20px',
             }}>
-              {recommendedProducts.map((product) => (
-                <Link
-                  key={product.id}
-                  to={`/products/${product.id}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                  <div
-                    style={{
-                      backgroundColor: 'white',
-                      borderRadius: '8px',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                      padding: '16px',
-                      transition: 'all 0.3s ease',
-                      cursor: 'pointer',
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)'
-                      e.currentTarget.style.transform = 'translateY(-4px)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'
-                      e.currentTarget.style.transform = 'translateY(0)'
-                    }}
+              {recommendedProducts.map((product) => {
+                const presentation = getProductPresentation(product)
+
+                return (
+                  <Link
+                    key={product.id}
+                    to={`/products/${product.id}`}
+                    style={{ textDecoration: 'none' }}
                   >
                     <div
                       style={{
-                        width: '100%',
-                        height: '140px',
-                        backgroundColor: '#f3f4f6',
-                        borderRadius: '4px',
-                        marginBottom: '12px',
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 1px 3px rgba(15, 23, 42, 0.12)',
+                        padding: '16px',
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer',
+                        height: '100%',
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        overflow: 'hidden',
+                        flexDirection: 'column',
+                        border: '1px solid rgba(148, 163, 184, 0.22)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = '0 14px 30px rgba(15, 23, 42, 0.18)'
+                        e.currentTarget.style.transform = 'translateY(-4px)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(15, 23, 42, 0.12)'
+                        e.currentTarget.style.transform = 'translateY(0)'
                       }}
                     >
-                      <img
-                        src={product.image}
-                        alt={product.title}
+                      <div
                         style={{
-                          maxWidth: '100%',
-                          maxHeight: '100%',
-                          objectFit: 'contain',
+                          width: '100%',
+                          height: '150px',
+                          background: `linear-gradient(135deg, ${presentation.accent}20, #f8fafc)`,
+                          borderRadius: '8px',
+                          marginBottom: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden',
+                          position: 'relative',
+                          border: '1px solid rgba(148, 163, 184, 0.18)',
                         }}
-                      />
+                      >
+                        <div
+                          aria-hidden="true"
+                          style={{
+                            width: '76px',
+                            height: presentation.visual === 'LAPTOP' ? '48px' : '86px',
+                            borderRadius: presentation.visual === 'LAPTOP' ? '8px 8px 3px 3px' : '18px',
+                            border: `4px solid ${presentation.accent}`,
+                            boxShadow: `0 18px 40px ${presentation.accent}30`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: presentation.accent,
+                            fontSize: '10px',
+                            fontWeight: 900,
+                            letterSpacing: '0.08em',
+                            backgroundColor: '#ffffff',
+                          }}
+                        >
+                          {presentation.visual}
+                        </div>
+                        <img
+                          src={product.image}
+                          alt={product.title}
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none'
+                          }}
+                          style={{
+                            position: 'absolute',
+                            inset: '10px',
+                            width: 'calc(100% - 20px)',
+                            height: 'calc(100% - 20px)',
+                            objectFit: 'contain',
+                            mixBlendMode: 'multiply',
+                          }}
+                        />
+                      </div>
+                      <span
+                        style={{
+                          alignSelf: 'flex-start',
+                          backgroundColor: `${presentation.accent}18`,
+                          color: presentation.accent,
+                          border: `1px solid ${presentation.accent}40`,
+                          borderRadius: '999px',
+                          padding: '4px 10px',
+                          fontSize: '12px',
+                          fontWeight: 800,
+                          marginBottom: '10px',
+                        }}
+                      >
+                        {presentation.label}
+                      </span>
+                      <h3
+                        style={{
+                          fontWeight: '700',
+                          marginBottom: '8px',
+                          color: '#0f172a',
+                          lineHeight: '1.25',
+                          fontSize: '18px',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        } as any}
+                      >
+                        {product.title}
+                      </h3>
+                      <p
+                        style={{
+                          color: 'var(--color-primary)',
+                          fontWeight: 'bold',
+                          fontSize: '16px',
+                          marginTop: 'auto',
+                        }}
+                      >
+                        ${product.price.toFixed(2)}
+                      </p>
                     </div>
-                    <h3
-                      style={{
-                        fontWeight: '600',
-                        marginBottom: '8px',
-                        color: '#1f2937',
-                        lineHeight: '1.3',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                      } as any}
-                    >
-                      {product.title}
-                    </h3>
-                    <p
-                      style={{
-                        color: 'var(--color-primary)',
-                        fontWeight: 'bold',
-                        fontSize: '16px',
-                      }}
-                    >
-                      ${product.price.toFixed(2)}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -245,7 +351,7 @@ const CartPage: FC = () => {
               boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
               overflow: 'hidden',
             }}>
-              {items.map((item, index) => (
+              {cartItems.map((item, index) => (
                 <div
                   key={item.id}
                   style={{
@@ -254,7 +360,7 @@ const CartPage: FC = () => {
                     gap: '16px',
                     padding: '16px',
                     borderBottom:
-                      index !== items.length - 1 ? '1px solid var(--color-gray-200)' : 'none',
+                      index !== cartItems.length - 1 ? '1px solid var(--color-gray-200)' : 'none',
                     alignItems: 'start',
                   }}
                 >
@@ -500,8 +606,9 @@ const CartPage: FC = () => {
             </div>
 
             {/* Checkout Button */}
-            <Link
-              to="/checkout"
+            <button
+              type="button"
+              onClick={handleCheckout}
               style={{
                 display: 'block',
                 width: '100%',
@@ -528,8 +635,8 @@ const CartPage: FC = () => {
                 e.currentTarget.style.boxShadow = 'none'
               }}
             >
-              ✓ Proceder al Pago
-            </Link>
+              {isAuthenticated ? '✓ Proceder al Pago' : 'Registrarse para finalizar'}
+            </button>
 
             {/* Clear Cart Button */}
             <button

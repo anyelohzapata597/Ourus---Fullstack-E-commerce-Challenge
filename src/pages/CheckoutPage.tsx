@@ -45,6 +45,7 @@ const CheckoutPage: FC = () => {
     touched,
     handleChange,
     handleBlur,
+    handleSubmit,
   } = useFormValidation({
     initialValues: {
       firstName: '',
@@ -106,6 +107,7 @@ const CheckoutPage: FC = () => {
             alert('¡Pedido confirmado! Número: ' + result.orderId)
           }, 2000)
         } catch (error) {
+          console.error('Error processing checkout:', error)
           setIsProcessing(false)
           alert('Error al procesar el pago. Por favor intenta nuevamente.')
         }
@@ -162,10 +164,7 @@ const CheckoutPage: FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form */}
           <div className="lg:col-span-2">
-            <form onSubmit={(e) => {
-              e.preventDefault()
-              handleChange(new Event('submit') as any)
-            }} className="bg-white rounded-lg shadow-md p-8 space-y-6">
+            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-8 space-y-6">
               {/* Shipping Step */}
               {currentStep === 'shipping' && (
                 <div className="space-y-6 animate-fade-in">
@@ -440,9 +439,7 @@ const CheckoutPage: FC = () => {
                 )}
                 <button
                   type="button"
-                  onClick={() => {
-                    handleChange(new Event('submit') as any)
-                  }}
+                  onClick={() => handleSubmit({ preventDefault: () => undefined } as React.FormEvent<HTMLFormElement>)}
                   disabled={isProcessing}
                   className="flex-1 bg-primary text-white font-bold py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition"
                 >

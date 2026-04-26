@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@stores/index'
 import { useNotification } from '@components/NotificationProvider'
 
@@ -16,8 +16,13 @@ interface RegisterForm {
  */
 const RegisterPage: FC = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { addNotification } = useNotification()
   const { register, isAuthenticated, error: authError, setError } = useAuthStore()
+  const redirectTo = (() => {
+    const state = location.state as { from?: { pathname?: string; search?: string } } | null
+    return `${state?.from?.pathname || '/'}${state?.from?.search || ''}`
+  })()
 
   const [formData, setFormData] = useState<RegisterForm>({
     name: '',
@@ -33,9 +38,9 @@ const RegisterPage: FC = () => {
   // Redirect si ya está autenticado
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/')
+      navigate(redirectTo, { replace: true })
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, navigate, redirectTo])
 
   // Calcular fuerza de contraseña
   useEffect(() => {
@@ -98,7 +103,7 @@ const RegisterPage: FC = () => {
       })
 
       addNotification(`¡Bienvenido ${formData.name}! Tu cuenta ha sido creada exitosamente.`, 'success', 3000)
-      navigate('/')
+      navigate(redirectTo, { replace: true })
     } catch (err) {
       addNotification('Error al crear la cuenta. Intenta nuevamente.', 'error', 3000)
     } finally {
